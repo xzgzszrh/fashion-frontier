@@ -1,0 +1,29 @@
+route,model,precision,params,val_accuracy,test_accuracy,board_throughput_img_s,board_total_time_s,device,deliverable,source,notes
+teacher,baseline_cnn,FP32,421834,0.9220,0.9174,,,host,no,Table 3,Engineering baseline. 12 epochs on Apple MPS in ~98.7 s.
+teacher,efficientnet_b0_transfer_95,FP32,4020358,0.9513,0.9477,,,host,no,Table 3,Migration to a pretrained backbone bought ~3 points.
+teacher,efficientnet_b0_finetune_95,FP32,4020358,0.9520,0.9455,,,host,no,Table 3,Low-LR refinement: val up 0.07 but test down 0.22.
+teacher,efficientnet_b0_fulltrain_95,FP32,4020358,,0.9463,,,host,no,Table 3,Trained on all 60000 images; still below the held-out-val run.
+teacher,efficientnet_b0_teacher_96_refine,FP32,4020358,0.9517,,,,host,no,Table 3,Teacher refinement checkpoint.
+teacher,ensemble_besttest,FP32,,0.9532,0.9488,,,host,no,Table 3,Best test ensemble. Soft-label source for distillation.
+teacher,ensemble_bestval,FP32,,0.9552,0.9474,,,host,no,Table 3,Best val ensemble.
+teacher,efficientnet_b0_on_arm_cpu,FP32,4020358,,0.9477,10.0,,PYNQ-Z1,no,Section 10.1,"Deploying the teacher directly is unusable: ~10 img/s on Cortex-A9."
+distill,cnn_m_baseline,FP32,,,0.915,,,host,no,Table 4,Lightweight student without distillation.
+distill,cnn_m_kd,FP32,,,0.923,,,host,no,Table 4,Same student with blend distillation: +0.8.
+distill,q_l_w4a4_base,4W4A,,,0.9358,,,host,no,Table 4,Quantised student before distillation.
+distill,q_l_w4a4_kd,4W4A,,,0.9369,,,host,no,Table 4,Blend distillation: +0.11.
+distill,finnconv_h8_base,4W4A,,,0.9349,,,host,no,Table 4,FINN-friendly head8 before distillation.
+distill,finnconv_h8_kd,4W4A,,,0.9355,,,host,no,Table 4,FINN-friendly head8 after blend distillation.
+distill,tinyplus_kd_full,FP32,,,0.9221,,,host,yes,Table 4,CPU-only accuracy tier with blend distillation.
+quant,q_md_w4a4_baseline,4W4A,,,0.9361,,,host,no,Table 6,Main FINN candidate before distillation.
+quant,q_md_w4a4_kdkl_t4,4W4A,,,0.9345,,,host,no,Table 6,KL distillation at T=4 underperformed blend.
+quant,finnconv_direct_head8_baseline,4W4A,,,0.9349,,,host,no,Table 6,Structural rebuild cost 0.12 vs q_md but unblocked dataflow.
+quant,finnconv_direct_head8_kd_noncheat,4W4A,,,0.9355,,,host,yes,Table 6,Best FINN-friendly student. Starting point for the future FPGA mainline.
+quant,finnconv_direct_head8_kdkl_t2,4W4A,,,0.9337,,,host,no,Table 6,KL at T=2 below blend here too.
+quant,finnconv_direct_head8_w2a2_kdkl,2W2A,,,,,,host,no,Table 6,No result recorded; 2W2A was not carried to completion.
+cpu,tinyplus_kd_fulltrain,INT8,658490,,0.9221,186.8,53.5,PYNQ-Z1,yes,Table 8,Accuracy tier. Full 10000-image board run.
+cpu,tinyfast_xs,INT8,237658,,,~310.0,,PYNQ-Z1,yes,Table 8,Middle tier. Throughput only; no accuracy in the paper table.
+cpu,tinyfast_xxs,INT8,182478,,0.9109,375.99,26.60,PYNQ-Z1,yes,Table 8,Balanced tier. Default recommendation for most scenarios.
+cpu,tinyfast_xxxs,INT8,133714,,0.9045,445.19,22.46,PYNQ-Z1,yes,Table 8,Speed tier. Fastest CPU result in the project.
+bnn,paper_bnnpynq_lfc_1w1a,1W1A,2910208,0.8387,0.8316,154096.0,,PYNQ-Z1,yes,Section 7,"Throughput at batch=256. 256-sample board bundle: 214 correct = 83.59%."
+bnn,fpga_quant_student_bnnpynq_lfc_w1a1_kdkl_t2_noncheat,1W1A,,,,,,,host,no,Section 7.2,"Collapsed to ~10%. Binary topology + KL + mismatched CE switched on at once."
+fpga,finnconv_direct_head8_kd_noncheat_board_run,4W4A,,,,,,,PYNQ-Z1,no,Section 6.4,"Board output stable but wrong (predicted 8, expected 9). Root cause isolated to the stitched-IP integration path."

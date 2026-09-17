@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 452" width="1200" height="452" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" role="img" aria-label="The four CPU tiers: parameters, test accuracy and board throughput">
+<rect width="1200" height="452" fill="#ffffff"/>
+<text x="60" y="46" font-size="25" font-weight="700" fill="#0f172a">The width ladder: four tiers, one board</text>
+<text x="60" y="72" font-size="14.5" fill="#64748b">Static INT8, ONNX Runtime 1.16.0 on the Cortex-A9 &#183; every accuracy is a full 10 000-image test-set run, not a 256-image bundle</text>
+<text x="60" y="108" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="0.7">TIER</text>
+<text x="306" y="108" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="0.7">PARAMETERS &#183; WHAT IT COSTS</text>
+<text x="640" y="108" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="0.7">TEST ACCURACY</text>
+<text x="812" y="108" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="0.7">BOARD THROUGHPUT</text>
+<line x1="60" y1="118" x2="1140" y2="118" stroke="#e2e8f0"/>
+<text x="60" y="146" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">tinyfast_xxxs</text>
+<text x="60" y="163" font-size="10.5" fill="#64748b">speed-first</text>
+<rect x="306" y="135" width="236" height="13" rx="6.5" fill="#f1f5f9"/>
+<rect x="306" y="135" width="47.9" height="13" rx="6.5" fill="#94a3b8"/>
+<text x="554" y="146" font-size="12" fill="#64748b" font-family="ui-monospace SFMono-Regular Menlo Consolas monospace">133 714</text>
+<text x="640" y="148" font-size="20" font-weight="700" fill="#0f172a">90.45 %</text>
+<rect x="812" y="135" width="236" height="13" rx="6.5" fill="#f1f5f9"/>
+<rect x="812" y="135" width="236.0" height="13" rx="6.5" fill="#2563eb"/>
+<text x="1060" y="146" font-size="12" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">445</text>
+<text x="1060" y="161" font-size="9.5" fill="#94a3b8">img/s</text>
+<rect x="52" y="190" width="1096" height="54" rx="8" fill="#eff6ff" stroke="none"/>
+<rect x="52" y="190" width="3" height="54" rx="1.5" fill="#2563eb"/>
+<text x="60" y="208" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">tinyfast_xxs</text>
+<text x="60" y="225" font-size="10.5" fill="#64748b">balanced — the default</text>
+<rect x="306" y="197" width="236" height="13" rx="6.5" fill="#f1f5f9"/>
+<rect x="306" y="197" width="65.4" height="13" rx="6.5" fill="#94a3b8"/>
+<text x="554" y="208" font-size="12" fill="#64748b" font-family="ui-monospace SFMono-Regular Menlo Consolas monospace">182 478</text>
+<text x="640" y="210" font-size="20" font-weight="700" fill="#0f172a">91.09 %</text>
+<rect x="812" y="197" width="236" height="13" rx="6.5" fill="#f1f5f9"/>
+<rect x="812" y="197" width="199.3" height="13" rx="6.5" fill="#2563eb"/>
+<text x="1060" y="208" font-size="12" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">376</text>
+<text x="1060" y="223" font-size="9.5" fill="#94a3b8">img/s</text>
+<text x="60" y="270" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">tinyfast_xs</text>
+<text x="60" y="287" font-size="10.5" fill="#64748b">middle tier</text>
+<rect x="306" y="259" width="236" height="13" rx="6.5" fill="#f1f5f9"/>
+<rect x="306" y="259" width="85.2" height="13" rx="6.5" fill="#94a3b8"/>
+<text x="554" y="270" font-size="12" fill="#64748b" font-family="ui-monospace SFMono-Regular Menlo Consolas monospace">237 658</text>
+<text x="640" y="270" font-size="14" font-weight="700" fill="#94a3b8">not published</text>
+<text x="640" y="287" font-size="10.5" fill="#94a3b8">the paper records throughput only</text>
+<rect x="812" y="259" width="236" height="13" rx="6.5" fill="#f1f5f9"/>
+<rect x="812" y="259" width="164.3" height="13" rx="6.5" fill="#2563eb"/>
+<text x="1060" y="270" font-size="12" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">310</text>
+<text x="1060" y="285" font-size="9.5" fill="#94a3b8">img/s</text>
+<text x="60" y="332" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">tinyplus_kd_fulltrain</text>
+<text x="60" y="349" font-size="10.5" fill="#64748b">accuracy-first</text>
+<rect x="306" y="321" width="236" height="13" rx="6.5" fill="#f1f5f9"/>
+<rect x="306" y="321" width="236.0" height="13" rx="6.5" fill="#94a3b8"/>
+<text x="554" y="332" font-size="12" fill="#64748b" font-family="ui-monospace SFMono-Regular Menlo Consolas monospace">658 490</text>
+<text x="640" y="334" font-size="20" font-weight="700" fill="#0f172a">92.21 %</text>
+<rect x="812" y="321" width="236" height="13" rx="6.5" fill="#f1f5f9"/>
+<rect x="812" y="321" width="99.0" height="13" rx="6.5" fill="#2563eb"/>
+<text x="1060" y="332" font-size="12" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">187</text>
+<text x="1060" y="347" font-size="9.5" fill="#94a3b8">img/s</text>
+<line x1="60" y1="358" x2="1140" y2="358" stroke="#e2e8f0"/>
+<text x="60" y="386" font-size="13" font-weight="700" fill="#0f172a">Trading 1.76 accuracy points buys 2.38× the throughput.</text>
+<text x="60" y="407" font-size="11.5" fill="#64748b">Read top to bottom and you are buying accuracy with latency; read bottom to top and you are giving accuracy away for it.</text>
+<text x="60" y="424" font-size="11.5" fill="#64748b">The middle tier is left empty on purpose: the paper publishes no accuracy for tinyfast_xs, so none is quoted here.</text>
+</svg>

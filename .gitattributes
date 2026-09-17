@@ -1,0 +1,18 @@
+# Normalise line endings so a Windows clone gets CRLF-free sources.
+* text=auto eol=lf
+
+# Binary payloads: never diff, never touch line endings.
+*.onnx binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.zip  binary
+*.pt   binary
+*.npz  binary
+
+# Keep generated web data out of merge conflicts; it is rebuilt by
+# scripts/build_web_data.py and diffed by CI.
+web/data/*.json linguist-generated=true
+
+# Explicit language stats instead of "HTML".
+docs/*.md linguist-documentation

@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fashion-frontier"
+version = "1.0.0"
+description = "End-to-end inference engineering on PYNQ-Z1: training, distillation, quantisation and multi-path deployment, measured across scenarios."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Fashion Frontier" }]
+keywords = [
+    "pynq",
+    "zynq",
+    "finn",
+    "brevitas",
+    "qonnx",
+    "quantization",
+    "knowledge-distillation",
+    "onnxruntime",
+    "edge-inference",
+    "fpga",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.24",
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "onnx>=1.14",
+    "onnxruntime>=1.16",
+    "pandas>=2.0",
+    "pyyaml>=6.0",
+    "scikit-learn>=1.3",
+    "tqdm>=4.65",
+]
+
+[project.optional-dependencies]
+quant = ["brevitas>=0.10", "qonnx>=0.1"]
+dev = ["pytest>=7.4", "ruff>=0.4"]
+plot = ["matplotlib>=3.7", "seaborn>=0.12"]
+
+[project.scripts]
+frontier = "fashionfrontier.cli:main"
+
+[project.urls]
+Documentation = "https://github.com/xzgzszrh/fashion-frontier#readme"
+Repository = "https://github.com/xzgzszrh/fashion-frontier"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = [
+    # torch >= 2.9 prefers the dynamo exporter; we pin the classic one on
+    # purpose (see fashionfrontier/export/onnx_export.py) so no extra dependency is needed.
+    "ignore:.*legacy TorchScript-based ONNX export.*:DeprecationWarning",
+    "ignore:.*The feature will be removed.*:DeprecationWarning",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]

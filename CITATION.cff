@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+title: "Fashion Frontier: End-to-End Inference Engineering on PYNQ-Z1"
+message: >-
+  If you use this repository, please cite it. The measured results it reports
+  are transcribed from the accompanying project paper -- cite that work as the
+  source of any number you take from benchmarks/results.csv.
+type: software
+authors:
+  - name: "xzgzszrh"
+license: MIT
+repository-code: "https://github.com/xzgzszrh/fashion-frontier"
+url: "https://github.com/xzgzszrh/fashion-frontier"
+keywords:
+  - pynq
+  - zynq-7020
+  - finn
+  - brevitas
+  - qonnx
+  - knowledge-distillation
+  - quantization-aware-training
+  - bnn
+  - onnxruntime
+  - edge-inference
+  - fpga
+preferred-citation:
+  type: article
+  title: "面向 PYNQ-Z1 平台的端到端推理最佳实践：从模型训练、蒸馏、量化到多路径部署的系统性探索"
+  year: 2026
+  month: 4
+  authors:
+    - name: "xzgzszrh"
+  notes: >-
+    Authoritative source for every number in benchmarks/results.csv. Table 3
+    (training), Table 4 (distillation), Table 6 (quantisation candidates),
+    Table 8 (CPU-only board results), section 7 (BNN), section 8.2 (board
+    runtime tuning), section 9 (six-scenario recommendations).

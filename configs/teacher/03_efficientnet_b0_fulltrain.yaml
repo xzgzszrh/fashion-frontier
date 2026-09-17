@@ -1,0 +1,54 @@
+# Stage 3 -- teacher finalisation on the full 60 000-image training split.
+#
+# val_split=0 removes the validation monitor, so the Trainer checkpoints the EMA
+# copy every epoch; keep an eye on it, this stage can overfit silently.
+#
+# Paper Table 3 (eb0_fulltrain_95): test 94.63 % -- i.e. training on everything
+# did NOT beat the 94.77 % obtained while holding out a validation set.
+experiment_name: efficientnet_b0_fulltrain_95
+seed: 42
+data_dir: data
+output_dir: outputs/efficientnet_b0_fulltrain_95
+device: auto
+init_checkpoint: outputs/efficientnet_b0_transfer_95/best_model.pt
+
+data:
+  image_size: 96
+  repeat_channels: 3
+  normalize_mean: [0.485, 0.456, 0.406]
+  normalize_std: [0.229, 0.224, 0.225]
+
+model:
+  name: torchvision_teacher
+  architecture: efficientnet_b0
+  pretrained: false
+  dropout: 0.25
+  num_classes: 10
+
+training:
+  batch_size: 64
+  epochs: 4
+  learning_rate: 0.00006
+  optimizer: adamw
+  weight_decay: 0.00005
+  grad_clip_norm: 1.0
+  ema_decay: 0.9996
+  ema_start_epoch: 1
+  num_workers: 0
+  val_split: 0.0
+  split_seed: 42
+  augmentation:
+    random_crop_padding: 2
+    rotation_degrees: 6
+    translate: 0.06
+    scale_min: 0.94
+    scale_max: 1.06
+    random_erasing_prob: 0.03
+  scheduler:
+    name: warmup_cosine
+    warmup_epochs: 1
+    start_factor: 0.5
+    eta_min: 0.000005
+
+export:
+  onnx_opset: 17

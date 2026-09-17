@@ -1,0 +1,52 @@
+# Stage 2 -- the teacher.
+#
+# Transfer learning bought ~3 points over the best self-designed CNN, which is
+# more than every subsequent fine-tune combined. Grayscale is replicated to 3
+# channels and upsampled to 96x96 so the ImageNet backbone has room to work.
+#
+# Paper Table 3: best val 95.13 %, test 94.77 %.
+experiment_name: efficientnet_b0_transfer_95
+seed: 42
+data_dir: data
+output_dir: outputs/efficientnet_b0_transfer_95
+device: auto
+
+data:
+  image_size: 96
+  repeat_channels: 3
+  normalize_mean: [0.485, 0.456, 0.406]
+  normalize_std: [0.229, 0.224, 0.225]
+
+model:
+  name: torchvision_teacher
+  architecture: efficientnet_b0
+  pretrained: true
+  dropout: 0.25
+  num_classes: 10
+
+training:
+  batch_size: 64
+  epochs: 12
+  learning_rate: 0.0002
+  optimizer: adamw
+  weight_decay: 0.00005
+  label_smoothing: 0.02
+  grad_clip_norm: 1.0
+  ema_decay: 0.9995
+  ema_start_epoch: 4
+  num_workers: 0
+  val_split: 0.1
+  split_seed: 42
+  augmentation:
+    random_crop_padding: 2
+    rotation_degrees: 8
+    translate: 0.08
+    scale_min: 0.90
+    scale_max: 1.10
+    random_erasing_prob: 0.05
+  scheduler:
+    name: cosine
+    eta_min: 0.00001
+
+export:
+  onnx_opset: 17

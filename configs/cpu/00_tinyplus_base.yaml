@@ -1,0 +1,46 @@
+# CPU route, step 0 -- undistilled width baseline.
+# Needed because 01_tinyplus_kd warm-starts from this checkpoint.
+# Not a delivered model on its own; kept so the ladder is reproducible end to end.
+experiment_name: tinyplus_base
+seed: 42
+data_dir: data
+output_dir: outputs/tinyplus_base
+device: auto
+
+data:
+  image_size: 28
+  repeat_channels: 1
+
+model:
+  name: tiny_fashion_cnn
+  variant: tinyplus
+  input_size: 28
+
+training:
+  batch_size: 256
+  epochs: 10
+  learning_rate: 0.0002
+  optimizer: adamw
+  weight_decay: 0.00006
+  label_smoothing: 0.0
+  grad_clip_norm: 1.0
+  ema_decay: 0.9994
+  ema_start_epoch: 2
+  num_workers: 0
+  val_split: 0.1
+  split_seed: 42
+  augmentation:
+    random_crop_padding: 2
+    rotation_degrees: 8
+    translate: 0.08
+    scale_min: 0.95
+    scale_max: 1.05
+    random_erasing_prob: 0.04
+  scheduler:
+    name: warmup_cosine
+    warmup_epochs: 1
+    start_factor: 0.3
+    eta_min: 0.00001
+
+export:
+  onnx_opset: 17

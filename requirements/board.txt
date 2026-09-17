@@ -1,0 +1,4 @@
+# PYNQ-Z1 board side. No torch, no torchvision: installing them on a Cortex-A9
+# is not worth anyone's afternoon. The board only needs to *run* ONNX models.
+numpy>=1.24
+onnxruntime>=1.16

@@ -1,0 +1,32 @@
+# artefacts
+outputs/
+artifacts/
+*.pt
+*.onnx
+*.npz
+!benchmarks/**/*.npz
+
+# ...but the browser demo ships a fixed set of verified checkpoints on purpose,
+# so that web/ works straight after a clone with no build step and no download.
+!web/models/*.onnx
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# data — root-level only. Written as /data/ so it does not also swallow
+# web/data/, which ships the figures the browser demo renders.
+/data/
+
+# os
+.DS_Store
+Thumbs.db
+
+# editors
+.idea/
+.vscode/

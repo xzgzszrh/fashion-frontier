@@ -1,0 +1,49 @@
+# BNN-PYNQ style 1W1A LFC -- the highest-throughput route in the project.
+# Requires: pip install -e ".[quant]"
+#
+# Paper section 7:
+#   paper_bnnpynq_lfc_fashion_1w1a -- test 83.16 %, best val 83.87 %
+#   board throughput at batch=256   -- ~154 096 img/s
+#   256-sample board bundle         -- 214/256 correct = 83.59 %
+#
+# IMPORTANT: distillation is OFF here on purpose. The first attempt
+# (..._w1a1_kdkl_t2_noncheat) collapsed to ~10 % because a binary topology,
+# KL distillation and a mismatched cross-entropy formulation were switched on
+# simultaneously. Stabilise the plain loop first, then add distillation.
+experiment_name: bnn_lfc_w1a1
+seed: 42
+data_dir: data
+output_dir: outputs/bnn_lfc_w1a1
+device: auto
+
+data:
+  image_size: 28
+  repeat_channels: 1
+
+model:
+  name: bnn_lfc
+  input_dim: 784
+  hidden_dims: [1024, 1024, 1024]
+  num_classes: 10
+  enable_bias: false
+
+training:
+  batch_size: 256
+  epochs: 60
+  learning_rate: 0.001
+  optimizer: adamw
+  weight_decay: 0.0
+  grad_clip_norm: 1.0
+  ema_decay: 0.999
+  ema_start_epoch: 10
+  num_workers: 0
+  val_split: 0.1
+  split_seed: 42
+  scheduler:
+    name: warmup_cosine
+    warmup_epochs: 3
+    start_factor: 0.1
+    eta_min: 0.00001
+
+export:
+  onnx_opset: 17

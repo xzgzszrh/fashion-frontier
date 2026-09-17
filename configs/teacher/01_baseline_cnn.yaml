@@ -1,0 +1,33 @@
+# Stage 1 -- engineering baseline.
+# Purpose: validate the training framework, evaluation flow and export tooling
+# before any accuracy work. 12 epochs, ~99 s on an Apple M-series host.
+#
+# Paper Table 3: best val 92.20 %, test 91.74 %.
+experiment_name: baseline_cnn
+seed: 42
+data_dir: data
+output_dir: outputs/baseline_cnn
+device: auto
+
+data:
+  image_size: 28
+  repeat_channels: 1
+
+model:
+  name: tiny_fashion_cnn
+  conv_channels: [32, 64]
+  hidden_dim: 128
+  dropout: 0.30
+
+training:
+  batch_size: 256
+  epochs: 12
+  learning_rate: 0.001
+  optimizer: adamw
+  weight_decay: 0.0001
+  num_workers: 0
+  val_split: 0.1
+  split_seed: 42
+
+export:
+  onnx_opset: 17

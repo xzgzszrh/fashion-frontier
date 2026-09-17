@@ -1,0 +1,51 @@
+# CPU route, step 1 -- distillation onto the widest tier.
+# Blend distillation (alpha=0.25) against the cached teacher soft targets.
+experiment_name: tinyplus_kd
+seed: 42
+data_dir: data
+output_dir: outputs/tinyplus_kd
+device: auto
+init_checkpoint: outputs/tinyplus_base/best_model.pt
+
+data:
+  image_size: 28
+  repeat_channels: 1
+
+model:
+  name: tiny_fashion_cnn
+  variant: tinyplus
+  input_size: 28
+
+training:
+  batch_size: 256
+  epochs: 10
+  learning_rate: 0.0002
+  optimizer: adamw
+  weight_decay: 0.00006
+  label_smoothing: 0.0
+  grad_clip_norm: 1.0
+  ema_decay: 0.9994
+  ema_start_epoch: 1
+  num_workers: 0
+  val_split: 0.1
+  split_seed: 42
+  augmentation:
+    random_crop_padding: 2
+    rotation_degrees: 7
+    translate: 0.05
+    scale_min: 0.96
+    scale_max: 1.04
+    random_erasing_prob: 0.03
+  scheduler:
+    name: warmup_cosine
+    warmup_epochs: 1
+    start_factor: 0.3
+    eta_min: 0.00001
+
+distillation:
+  teacher_targets_path: outputs/soft_targets/teacher_targets_full_train.npz
+  method: blend
+  alpha: 0.25
+
+export:
+  onnx_opset: 17

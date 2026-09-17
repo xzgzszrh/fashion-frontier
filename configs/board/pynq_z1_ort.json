@@ -1,0 +1,33 @@
+{
+  "_comment": "Runtime configuration converged on for PYNQ-Z1 (dual-core Cortex-A9 @ 650 MHz). Values are the measured optimum from the parameter sweep in paper section 8.2, not defaults.",
+  "device": "PYNQ-Z1",
+  "soc": "Xilinx Zynq-7020",
+  "cpu": "dual-core ARM Cortex-A9 @ 650 MHz",
+  "os": "PYNQ Linux 3.0 (Ubuntu)",
+  "python": "3.10",
+  "onnxruntime": "1.16.0",
+  "session": {
+    "intra_op_num_threads": 2,
+    "inter_op_num_threads": 1,
+    "graph_optimization_level": "ORT_ENABLE_ALL",
+    "providers": ["CPUExecutionProvider"],
+    "_intra_op_note": "2 cores instead of 1 gives +30-50% throughput",
+    "_inter_op_note": "more than 1 parallel stream only added scheduling overhead",
+    "_session_note": "session construction costs 100-300 ms; build once and reuse"
+  },
+  "inference": {
+    "batch_size": 256,
+    "_batch_note": "large batches keep NEON vector lanes busy; dropping to 64 costs ~35% throughput but cuts per-image latency to ~5 ms"
+  },
+  "quantization": {
+    "method": "quantize_static",
+    "activation_type": "QInt8",
+    "weight_type": "QInt8",
+    "per_channel": true,
+    "quant_format": "QOperator",
+    "calibration_samples": 256,
+    "_speedup": "1.5-2x over FP32",
+    "_qoperator_note": "QOperator is 10-20% faster than QDQ on this target",
+    "_calibration_note": "256 was the empirical optimum for this dataset"
+  }
+}

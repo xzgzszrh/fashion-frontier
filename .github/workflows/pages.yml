@@ -1,0 +1,75 @@
+name: Pages
+
+# Publishes web/ so the demo is openable rather than merely clonable. The page
+# runs entirely client-side, so the artefact is just static files.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - "benchmarks/results.csv"
+      - "scripts/build_web_data.py"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # The page claims its figures cannot drift from benchmarks/results.csv.
+      # Regenerating and diffing is what makes that claim true rather than
+      # aspirational.
+      - name: Web data must match benchmarks/results.csv
+        run: |
+          python scripts/build_web_data.py
+          git diff --exit-code -- web/data/results.json
+
+      - name: Shipped checkpoints must be present and non-empty
+        run: |
+          shopt -s nullglob
+          files=(web/models/*.onnx)
+          echo "${#files[@]} checkpoint(s)"
+          [ "${#files[@]}" -eq 5 ] || { echo "expected 5 ONNX checkpoints in web/models/"; exit 1; }
+          for f in "${files[@]}"; do
+            [ -s "$f" ] || { echo "empty checkpoint: $f"; exit 1; }
+          done
+          ls -l web/models
+
+      - name: Sample images must be present
+        run: |
+          shopt -s nullglob
+          samples=(web/samples/*.png)
+          echo "${#samples[@]} sample image(s)"
+          [ "${#samples[@]}" -eq 10 ] || { echo "expected 10 sample images in web/samples/"; exit 1; }
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fashion Frontier — accuracy vs throughput on PYNQ-Z1</title>
+<meta name="description" content="Five Fashion-MNIST models measured on a PYNQ-Z1, from a 94.77% teacher to a 154 096 img/s FPGA fabric route. Runs the real checkpoints in your browser.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232563eb'/><circle cx='11' cy='9' r='3' fill='%23fff'/><circle cx='22' cy='22' r='3' fill='%23ea580c'/></svg>">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top"><span class="mark"></span>Fashion Frontier</a>
+    <nav>
+      <a href="#demo">Live demo</a>
+      <a href="#frontier">Frontier</a>
+      <a href="#results">Results</a>
+      <a href="#playbook">Playbook</a>
+      <a href="#routes">Routes</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ------------------------------------------------------------ hero -->
+  <section id="top" class="hero">
+    <div class="hero-in">
+      <div class="eyebrow">Fashion-MNIST · PYNQ-Z1 · accuracy against latency</div>
+      <h1>Nobody ships the most accurate model.<br><em>They ship the one that fits.</em></h1>
+      <p class="lede">
+        This board runs five checkpoints across three routes, from a 94.77% teacher that
+        manages <strong>10 images per second</strong> to a binary network that manages
+        <strong>154 096</strong>. Every number here was measured, and the failures are
+        written up alongside the wins.
+      </p>
+      <div class="stats" id="heroStats"></div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ demo -->
+  <section id="demo" class="band">
+    <div class="band-in">
+      <h2>Run the real checkpoints, in this browser</h2>
+      <p class="sub">
+        These are the actual ONNX files, re-verified against the full 10 000-image test set
+        before shipping. Pick a checkpoint and an image, and the numbers below come from your
+        machine — not from a screenshot.
+      </p>
+
+      <div class="demo">
+        <div>
+          <div class="ctl-label">1 · checkpoint</div>
+          <div class="models" id="modelPicker" role="group" aria-label="Choose a checkpoint"></div>
+
+          <div class="ctl-label">2 · test image</div>
+          <div class="input-row" id="samplePicker" role="group" aria-label="Choose a test image"></div>
+          <div class="input-row" style="margin-top:6px">
+            <button class="upload" id="upload" type="button" title="Upload your own image" aria-label="Upload your own image">+</button>
+            <input type="file" id="file" accept="image/*" class="sr">
+            <span class="placeholder" style="align-self:center;font-size:12.5px">
+              or drop in your own — no ground truth, so correctness is not checked
+            </span>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="runOne" type="button">Predict</button>
+            <button class="btn" id="runAll" type="button">Compare all five</button>
+          </div>
+          <div class="status" id="status"></div>
+        </div>
+
+        <div class="out" id="output">
+          <p class="placeholder">Loading data…</p>
+        </div>
+      </div>
+
+      <!-- The five-model comparison needs eight columns, so it gets the full
+           width of the section rather than the narrow right-hand panel. -->
+      <div class="compare-block" id="compareBlock" hidden></div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ frontier -->
+  <section id="frontier" class="band alt">
+    <div class="band-in">
+      <h2>The curve you actually have to pick a point on</h2>
+      <p class="sub">
+        Throughput is on a log axis, because the span is four decades wide. Read it left to
+        right and you are giving up accuracy for speed; read it right to left and you are
+        buying accuracy with latency. There is no free move in either direction.
+      </p>
+      <div class="chart-wrap">
+        <svg id="frontierSvg" viewBox="0 0 1000 470" role="img"
+             aria-label="Test accuracy against board throughput for five measured models"></svg>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--cpu)"></i>INT8 CPU tiers — shipped</span>
+        <span><i class="dot" style="background:var(--fabric)"></i>1W1A FPGA fabric — shipped</span>
+        <span><i class="dot" style="background:var(--ref)"></i>FP32 on ARM — measured, not shipped</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ results -->
+  <section id="results" class="band">
+    <div class="band-in">
+      <h2>The authoritative table</h2>
+      <p class="sub">
+        Transcribed from the paper, one row per experiment, with the source cited. The same
+        rows drive <code>benchmarks/results.csv</code>, the README figures and this page —
+        they cannot drift apart.
+      </p>
+      <div class="filters" id="filters"></div>
+      <div class="chip" style="margin-bottom:12px" id="resultsCount"></div>
+      <div class="cmp-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Route</th><th>Model</th><th>Prec</th><th>Params</th>
+              <th>Val</th><th>Test</th><th>img/s</th><th>10k s</th>
+              <th>Device</th><th>Shipped</th><th>Source</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ playbook -->
+  <section id="playbook" class="band alt">
+    <div class="band-in">
+      <h2>Given a constraint, pick a model</h2>
+      <p class="sub">
+        Six scenarios, each one a real question with a defensible answer. This is the part of
+        the project that transfers to other problems — the architecture does not.
+      </p>
+      <div class="play">
+        <div class="play-list" id="playList" role="group" aria-label="Choose a scenario"></div>
+        <div class="play-detail" id="playDetail"></div>
+      </div>
+
+      <div class="tree">
+        <div class="tree-head" id="treeHead"></div>
+        <div id="treeBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ routes -->
+  <section id="routes" class="band">
+    <div class="band-in">
+      <h2>Three routes, two closed loops</h2>
+      <p class="sub">
+        One dataset, one board, three different answers to "how do I deploy this" — and one of
+        them is documented as unfinished rather than dressed up.
+      </p>
+      <div class="routes" id="routeList"></div>
+      <div class="caveats" id="caveats"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot-in">
+    <div>
+      Fashion Frontier · MIT ·
+      <a href="../docs/00-overview.md">docs</a> ·
+      <a href="../benchmarks/results.csv">results.csv</a> ·
+      <a href="../docs/09-lessons-and-negative-results.md">what failed</a>
+    </div>
+    <div>
+      Inference by onnxruntime-web <span id="ortv">1.22.0</span> (WASM, single-threaded).
+      Numbers come from <code>benchmarks/results.csv</code>; nothing on this page is invented.
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.min.js"></script>
+<script src="assets/inference.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

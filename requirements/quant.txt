@@ -1,0 +1,4 @@
+# Optional: quantisation-aware training and the BNN route
+-r base.txt
+brevitas>=0.10
+qonnx>=0.1

@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="1200" height="640" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" role="img" aria-label="End-to-end pipeline: Fashion-MNIST to a PYNQ-Z1, plus the accelerator branch">
+<rect width="1200" height="640" fill="#ffffff"/>
+<text x="60" y="46" font-size="25" font-weight="700" fill="#0f172a">From Fashion-MNIST to the board, end to end</text>
+<text x="60" y="72" font-size="14.5" fill="#64748b">Every box has a config under configs/ and a document under docs/ &#183; the numbers are the paper&#8217;s, transcribed into benchmarks/results.csv</text>
+<rect x="60" y="104" width="160" height="126" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+<rect x="60" y="104" width="160" height="3" rx="1.5" fill="#2563eb"/>
+<text x="76" y="130" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="0.7">DATA</text>
+<text x="76" y="152" font-size="14.5" font-weight="700" fill="#0f172a">Fashion-MNIST</text>
+<text x="76" y="174" font-size="10.5" fill="#64748b">60 000 train</text>
+<text x="76" y="191" font-size="10.5" fill="#64748b">10 000 test</text>
+<text x="76" y="208" font-size="10.5" fill="#64748b">frozen splits</text>
+<line x1="224" y1="167.0" x2="240" y2="167.0" stroke="#cbd5e1" stroke-width="1.6"/>
+<path d="M 240 167.0 l -6 -4 l 0 8 z" fill="#cbd5e1"/>
+<rect x="244" y="104" width="160" height="126" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+<rect x="244" y="104" width="160" height="3" rx="1.5" fill="#2563eb"/>
+<text x="260" y="130" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="0.7">TEACHER</text>
+<text x="260" y="152" font-size="14.5" font-weight="700" fill="#0f172a">EfficientNet-B0</text>
+<text x="260" y="174" font-size="10.5" fill="#64748b">94.77 % test</text>
+<text x="260" y="191" font-size="10.5" fill="#64748b">4 020 358 params</text>
+<text x="260" y="208" font-size="10.5" fill="#94a3b8" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">configs/teacher/02</text>
+<line x1="408" y1="167.0" x2="424" y2="167.0" stroke="#cbd5e1" stroke-width="1.6"/>
+<path d="M 424 167.0 l -6 -4 l 0 8 z" fill="#cbd5e1"/>
+<rect x="428" y="104" width="160" height="126" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+<rect x="428" y="104" width="160" height="3" rx="1.5" fill="#2563eb"/>
+<text x="444" y="130" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="0.7">DISTILL</text>
+<text x="444" y="152" font-size="14.5" font-weight="700" fill="#0f172a">Soft targets</text>
+<text x="444" y="174" font-size="10.5" fill="#64748b">exported once</text>
+<text x="444" y="191" font-size="10.5" fill="#64748b">blend + KL</text>
+<text x="444" y="208" font-size="10.5" fill="#94a3b8" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">configs/teacher/04</text>
+<line x1="592" y1="167.0" x2="608" y2="167.0" stroke="#cbd5e1" stroke-width="1.6"/>
+<path d="M 608 167.0 l -6 -4 l 0 8 z" fill="#cbd5e1"/>
+<rect x="612" y="104" width="160" height="126" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+<rect x="612" y="104" width="160" height="3" rx="1.5" fill="#2563eb"/>
+<text x="628" y="130" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="0.7">STUDENTS</text>
+<text x="628" y="152" font-size="14.5" font-weight="700" fill="#0f172a">TinyFashionCNN ×4</text>
+<text x="628" y="174" font-size="10.5" fill="#64748b">90.45 – 92.21 %</text>
+<text x="628" y="191" font-size="10.5" fill="#64748b">133 714 – 658 490</text>
+<text x="628" y="208" font-size="10.5" fill="#94a3b8" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">configs/cpu/00..05</text>
+<line x1="776" y1="167.0" x2="792" y2="167.0" stroke="#cbd5e1" stroke-width="1.6"/>
+<path d="M 792 167.0 l -6 -4 l 0 8 z" fill="#cbd5e1"/>
+<rect x="796" y="104" width="160" height="126" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+<rect x="796" y="104" width="160" height="3" rx="1.5" fill="#2563eb"/>
+<text x="812" y="130" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="0.7">EXPORT</text>
+<text x="812" y="152" font-size="14.5" font-weight="700" fill="#0f172a">ONNX → INT8</text>
+<text x="812" y="174" font-size="10.5" fill="#64748b">round-trip checked</text>
+<text x="812" y="191" font-size="10.5" fill="#64748b">static, QOperator</text>
+<text x="812" y="208" font-size="10.5" fill="#64748b">256 calibration imgs</text>
+<line x1="960" y1="167.0" x2="976" y2="167.0" stroke="#cbd5e1" stroke-width="1.6"/>
+<path d="M 976 167.0 l -6 -4 l 0 8 z" fill="#cbd5e1"/>
+<rect x="980" y="104" width="160" height="126" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+<rect x="980" y="104" width="160" height="3" rx="1.5" fill="#2563eb"/>
+<text x="996" y="130" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="0.7">BOARD</text>
+<text x="996" y="152" font-size="14.5" font-weight="700" fill="#0f172a">PYNQ-Z1</text>
+<text x="996" y="174" font-size="10.5" fill="#64748b">445 img/s peak</text>
+<text x="996" y="191" font-size="10.5" fill="#64748b">26.60 s / 10 000</text>
+<text x="996" y="208" font-size="10.5" fill="#64748b">intra_op=2, batch=256</text>
+<text x="1140" y="92" font-size="10.5" font-weight="700" fill="#2563eb" letter-spacing="0.6" text-anchor="end">THE ROUTE THAT CLOSED &#183; SHIPPED</text>
+<line x1="692.0" y1="230" x2="692.0" y2="288" stroke="#fed7aa" stroke-width="1.8" stroke-dasharray="5 4"/>
+<circle cx="692.0" cy="288" r="4" fill="#ea580c"/>
+<text x="706.0" y="282" font-size="10.5" fill="#ea580c" font-weight="600">the same students, retargeted at the fabric</text>
+<rect x="60" y="306" width="1080" height="236" rx="12" fill="#fff7ed" stroke="#fed7aa"/>
+<text x="84" y="334" font-size="10.5" font-weight="700" fill="#ea580c" letter-spacing="0.7">THE ACCELERATOR BRANCH &#183; TWO MORE ANSWERS TO THE SAME QUESTION</text>
+<rect x="96" y="352" width="480" height="58" rx="8" fill="#ffffff" stroke="#fed7aa"/>
+<text x="112" y="376" font-size="13" font-weight="700" fill="#0f172a">Brevitas QAT → 1W1A</text>
+<text x="112" y="394" font-size="10.5" fill="#64748b">weights and activations binarised</text>
+<line x1="336.0" y1="410" x2="336.0" y2="432" stroke="#fed7aa" stroke-width="1.8"/>
+<path d="M 336.0 432 l -4 -6 l 8 0 z" fill="#fed7aa"/>
+<rect x="96" y="432" width="480" height="58" rx="8" fill="#ffffff" stroke="#ea580c" stroke-width="1.4"/>
+<text x="112" y="456" font-size="13" font-weight="700" fill="#0f172a">BNN-PYNQ fabric</text>
+<text x="112" y="475" font-size="10.5" font-weight="600" fill="#2563eb">closed loop</text>
+<text x="276" y="475" font-size="10.5" font-weight="600" fill="#0f172a">83.16 % test</text>
+<text x="440" y="475" font-size="10.5" font-weight="600" fill="#0f172a">154 096 img/s</text>
+<rect x="624" y="352" width="480" height="58" rx="8" fill="#ffffff" stroke="#fed7aa"/>
+<text x="640" y="376" font-size="13" font-weight="700" fill="#0f172a">Brevitas QAT → 4W4A</text>
+<text x="640" y="394" font-size="10.5" fill="#64748b">FINN-friendly head, dataflow safe</text>
+<line x1="864.0" y1="410" x2="864.0" y2="432" stroke="#fed7aa" stroke-width="1.8"/>
+<path d="M 864.0 432 l -4 -6 l 8 0 z" fill="#fed7aa"/>
+<rect x="624" y="432" width="480" height="58" rx="8" fill="#ffffff" stroke="#ea580c" stroke-width="1.4"/>
+<text x="640" y="456" font-size="13" font-weight="700" fill="#0f172a">FINN bitstream</text>
+<text x="640" y="475" font-size="10.5" font-weight="600" fill="#ea580c">bitstream runs</text>
+<text x="804" y="475" font-size="10.5" font-weight="600" fill="#0f172a">93.55 % on host</text>
+<text x="968" y="475" font-size="10.5" font-weight="600" fill="#64748b">not reached on board</text>
+<text x="60" y="568" font-size="11.5" fill="#64748b">The FINN branch is written up as unfinished rather than packaged as a success: the bitstream generates, loads and executes,</text>
+<text x="60" y="585" font-size="11.5" fill="#64748b">but its output does not match the golden reference. Root cause is isolated to the stitched-IP integration path &#8212; docs/05.</text>
+</svg>

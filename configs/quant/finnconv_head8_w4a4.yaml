@@ -1,0 +1,58 @@
+# FINN-friendly 4W4A quantisation-aware training.
+# Requires: pip install -e ".[quant]"
+#
+# The structural switches below are the whole point of this file. They are the
+# direct consequence of a failed FINN estimate: MaxPoolNHWC, GlobalAveragePool,
+# Flatten, MatMul, Mul and Add were all rejected by the dataflow frontend, so the
+# topology was rebuilt with stride-conv downsampling and a 1x1 conv head.
+# Accuracy cost of that rebuild: 93.49 % -> 93.55 %, i.e. none.
+#
+# Paper Table 6: finnconv_direct_head8_kd_noncheat = 93.55 % test.
+experiment_name: finnconv_head8_w4a4_kd
+seed: 42
+data_dir: data
+output_dir: outputs/finnconv_head8_w4a4_kd
+device: auto
+
+data:
+  image_size: 28
+  repeat_channels: 1
+
+model:
+  name: finnconv_head8
+  weight_bit_width: 4
+  act_bit_width: 4
+
+training:
+  batch_size: 256
+  epochs: 30
+  learning_rate: 0.001
+  optimizer: adamw
+  weight_decay: 0.00005
+  grad_clip_norm: 1.0
+  ema_decay: 0.9995
+  ema_start_epoch: 3
+  num_workers: 0
+  val_split: 0.1
+  split_seed: 42
+  augmentation:
+    random_crop_padding: 2
+    rotation_degrees: 6
+    translate: 0.05
+    scale_min: 0.96
+    scale_max: 1.04
+    random_erasing_prob: 0.03
+  scheduler:
+    name: warmup_cosine
+    warmup_epochs: 2
+    start_factor: 0.25
+    eta_min: 0.00001
+
+distillation:
+  teacher_targets_path: outputs/soft_targets/teacher_targets_full_train.npz
+  # Blend, not KL: for low-bit students blend was the stable choice.
+  method: blend
+  alpha: 0.5
+
+export:
+  onnx_opset: 17

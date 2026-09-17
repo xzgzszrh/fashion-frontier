@@ -1,0 +1,662 @@
+{
+  "_generated_by": "scripts/build_web_data.py",
+  "_source_of_truth": "benchmarks/results.csv",
+  "_note": "Do not edit by hand. Every number here is derived from the results table, which is itself a transcription of the paper.",
+  "classes": [
+    "T-shirt/top",
+    "Trouser",
+    "Pullover",
+    "Dress",
+    "Coat",
+    "Sandal",
+    "Shirt",
+    "Sneaker",
+    "Bag",
+    "Ankle boot"
+  ],
+  "frontier": [
+    {
+      "label": "efficientnet_b0_on_arm_cpu",
+      "throughput": 10.0,
+      "accuracy": 94.77,
+      "family": "reference",
+      "precision": "FP32",
+      "source": "Section 10.1"
+    },
+    {
+      "label": "tinyplus_kd_fulltrain",
+      "throughput": 186.8,
+      "accuracy": 92.21,
+      "family": "cpu",
+      "precision": "INT8",
+      "source": "Table 8"
+    },
+    {
+      "label": "tinyfast_xxs",
+      "throughput": 375.99,
+      "accuracy": 91.09,
+      "family": "cpu",
+      "precision": "INT8",
+      "source": "Table 8"
+    },
+    {
+      "label": "tinyfast_xxxs",
+      "throughput": 445.19,
+      "accuracy": 90.45,
+      "family": "cpu",
+      "precision": "INT8",
+      "source": "Table 8"
+    },
+    {
+      "label": "paper_bnnpynq_lfc_1w1a",
+      "throughput": 154096.0,
+      "accuracy": 83.16,
+      "family": "fabric",
+      "precision": "1W1A",
+      "source": "Section 7"
+    }
+  ],
+  "throughput_only": [
+    {
+      "label": "tinyfast_xs",
+      "throughput": 310.0,
+      "note": "Middle tier. Throughput only; no accuracy in the paper table.",
+      "source": "Table 8"
+    }
+  ],
+  "demo_models": [
+    {
+      "id": "tinyfast_xxxs",
+      "file": "models/tinyfast_xxxs_int8.onnx",
+      "image_size": 28,
+      "channels": 1,
+      "lazy": false,
+      "row": "tinyfast_xxxs",
+      "tier": "Speed",
+      "family": "cpu",
+      "params": 133714,
+      "artifact_accuracy": 0.9045,
+      "blurb": "The fastest CPU result in the project. Throws away 0.6 points against the balanced tier and buys 18% more throughput.",
+      "source_artifact": "pynq_cpu_tinyfast_xxxs_v1/best_model_int8_qop.onnx",
+      "bytes": 139774,
+      "precision": "INT8",
+      "paper_accuracy": 0.9045,
+      "paper_val_accuracy": null,
+      "paper_source": "Table 8",
+      "board_throughput_img_s": 445.19,
+      "board_total_time_s": 22.46,
+      "mean": [
+        0.286
+      ],
+      "std": [
+        0.353
+      ]
+    },
+    {
+      "id": "tinyfast_xxs",
+      "file": "models/tinyfast_xxs_int8.onnx",
+      "image_size": 28,
+      "channels": 1,
+      "lazy": false,
+      "row": "tinyfast_xxs",
+      "tier": "Balanced",
+      "family": "cpu",
+      "params": 182478,
+      "artifact_accuracy": 0.9101,
+      "blurb": "The default recommendation. Sits almost exactly in the middle of the CPU frontier, which is where most real constraints land.",
+      "source_artifact": "pynq_cpu_tinyfast_xxs_v1/best_model_int8_qop.onnx",
+      "bytes": 188702,
+      "precision": "INT8",
+      "paper_accuracy": 0.9109,
+      "paper_val_accuracy": null,
+      "paper_source": "Table 8",
+      "board_throughput_img_s": 375.99,
+      "board_total_time_s": 26.6,
+      "mean": [
+        0.286
+      ],
+      "std": [
+        0.353
+      ]
+    },
+    {
+      "id": "tinyplus_kd_fulltrain",
+      "file": "models/tinyplus_kd_int8.onnx",
+      "image_size": 28,
+      "channels": 1,
+      "lazy": false,
+      "row": "tinyplus_kd_fulltrain",
+      "tier": "Accuracy",
+      "family": "cpu",
+      "params": 658490,
+      "artifact_accuracy": 0.9219,
+      "blurb": "4.9x the parameters of the speed tier for 1.76 accuracy points, at 42% of the throughput. The clearest demonstration on this board that width stops paying.",
+      "source_artifact": "pynq_cpu_tinyplus_kd_v1_fulltrain/best_model_int8_qop.onnx",
+      "bytes": 665693,
+      "precision": "INT8",
+      "paper_accuracy": 0.9221,
+      "paper_val_accuracy": null,
+      "paper_source": "Table 8",
+      "board_throughput_img_s": 186.8,
+      "board_total_time_s": 53.5,
+      "mean": [
+        0.286
+      ],
+      "std": [
+        0.353
+      ]
+    },
+    {
+      "id": "baseline_cnn",
+      "file": "models/baseline_cnn_fp32.onnx",
+      "image_size": 28,
+      "channels": 1,
+      "lazy": false,
+      "row": "baseline_cnn",
+      "tier": "Baseline",
+      "family": "reference",
+      "params": 421834,
+      "artifact_accuracy": 0.9174,
+      "blurb": "The first model that worked. Higher accuracy than two of the shipped tiers and slower than all of them - which is exactly why it was not shipped.",
+      "source_artifact": "baseline_cnn/best_model.onnx",
+      "bytes": 1688646,
+      "precision": "FP32",
+      "paper_accuracy": 0.9174,
+      "paper_val_accuracy": 0.922,
+      "paper_source": "Table 3",
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "mean": [
+        0.286
+      ],
+      "std": [
+        0.353
+      ]
+    },
+    {
+      "id": "efficientnet_b0_transfer_95",
+      "file": "models/efficientnet_b0_fp32.onnx",
+      "image_size": 96,
+      "channels": 3,
+      "lazy": true,
+      "row": "efficientnet_b0_transfer_95",
+      "tier": "Teacher",
+      "family": "reference",
+      "params": 4020358,
+      "artifact_accuracy": 0.9477,
+      "blurb": "The accuracy ceiling and the source of every soft label. Running it directly on the board gives the single worst throughput in the project, which is the problem distillation exists to solve.",
+      "source_artifact": "efficientnet_b0_transfer_95/best_model.onnx",
+      "bytes": 16076960,
+      "precision": "FP32",
+      "paper_accuracy": 0.9477,
+      "paper_val_accuracy": 0.9513,
+      "paper_source": "Table 3",
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ]
+    }
+  ],
+  "samples": [
+    {
+      "file": "samples/sample_00.png",
+      "label_index": 0,
+      "label": "T-shirt/top"
+    },
+    {
+      "file": "samples/sample_01.png",
+      "label_index": 1,
+      "label": "Trouser"
+    },
+    {
+      "file": "samples/sample_02.png",
+      "label_index": 2,
+      "label": "Pullover"
+    },
+    {
+      "file": "samples/sample_03.png",
+      "label_index": 3,
+      "label": "Dress"
+    },
+    {
+      "file": "samples/sample_04.png",
+      "label_index": 4,
+      "label": "Coat"
+    },
+    {
+      "file": "samples/sample_05.png",
+      "label_index": 5,
+      "label": "Sandal"
+    },
+    {
+      "file": "samples/sample_06.png",
+      "label_index": 6,
+      "label": "Shirt"
+    },
+    {
+      "file": "samples/sample_07.png",
+      "label_index": 7,
+      "label": "Sneaker"
+    },
+    {
+      "file": "samples/sample_08.png",
+      "label_index": 8,
+      "label": "Bag"
+    },
+    {
+      "file": "samples/sample_09.png",
+      "label_index": 9,
+      "label": "Ankle boot"
+    }
+  ],
+  "table": [
+    {
+      "route": "teacher",
+      "model": "baseline_cnn",
+      "precision": "FP32",
+      "params": 421834,
+      "val_accuracy": 0.922,
+      "test_accuracy": 0.9174,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 3",
+      "notes": "Engineering baseline. 12 epochs on Apple MPS in ~98.7 s."
+    },
+    {
+      "route": "teacher",
+      "model": "efficientnet_b0_finetune_95",
+      "precision": "FP32",
+      "params": 4020358,
+      "val_accuracy": 0.952,
+      "test_accuracy": 0.9455,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 3",
+      "notes": "Low-LR refinement: val up 0.07 but test down 0.22."
+    },
+    {
+      "route": "teacher",
+      "model": "efficientnet_b0_fulltrain_95",
+      "precision": "FP32",
+      "params": 4020358,
+      "val_accuracy": null,
+      "test_accuracy": 0.9463,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 3",
+      "notes": "Trained on all 60000 images; still below the held-out-val run."
+    },
+    {
+      "route": "teacher",
+      "model": "efficientnet_b0_on_arm_cpu",
+      "precision": "FP32",
+      "params": 4020358,
+      "val_accuracy": null,
+      "test_accuracy": 0.9477,
+      "board_throughput_img_s": 10.0,
+      "board_total_time_s": null,
+      "device": "PYNQ-Z1",
+      "deliverable": "no",
+      "source": "Section 10.1",
+      "notes": "Deploying the teacher directly is unusable: ~10 img/s on Cortex-A9."
+    },
+    {
+      "route": "teacher",
+      "model": "efficientnet_b0_teacher_96_refine",
+      "precision": "FP32",
+      "params": 4020358,
+      "val_accuracy": 0.9517,
+      "test_accuracy": null,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 3",
+      "notes": "Teacher refinement checkpoint."
+    },
+    {
+      "route": "teacher",
+      "model": "efficientnet_b0_transfer_95",
+      "precision": "FP32",
+      "params": 4020358,
+      "val_accuracy": 0.9513,
+      "test_accuracy": 0.9477,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 3",
+      "notes": "Migration to a pretrained backbone bought ~3 points."
+    },
+    {
+      "route": "teacher",
+      "model": "ensemble_besttest",
+      "precision": "FP32",
+      "params": null,
+      "val_accuracy": 0.9532,
+      "test_accuracy": 0.9488,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 3",
+      "notes": "Best test ensemble. Soft-label source for distillation."
+    },
+    {
+      "route": "teacher",
+      "model": "ensemble_bestval",
+      "precision": "FP32",
+      "params": null,
+      "val_accuracy": 0.9552,
+      "test_accuracy": 0.9474,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 3",
+      "notes": "Best val ensemble."
+    },
+    {
+      "route": "distill",
+      "model": "cnn_m_baseline",
+      "precision": "FP32",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.915,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 4",
+      "notes": "Lightweight student without distillation."
+    },
+    {
+      "route": "distill",
+      "model": "cnn_m_kd",
+      "precision": "FP32",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.923,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 4",
+      "notes": "Same student with blend distillation: +0.8."
+    },
+    {
+      "route": "distill",
+      "model": "finnconv_h8_base",
+      "precision": "4W4A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.9349,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 4",
+      "notes": "FINN-friendly head8 before distillation."
+    },
+    {
+      "route": "distill",
+      "model": "finnconv_h8_kd",
+      "precision": "4W4A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.9355,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 4",
+      "notes": "FINN-friendly head8 after blend distillation."
+    },
+    {
+      "route": "distill",
+      "model": "q_l_w4a4_base",
+      "precision": "4W4A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.9358,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 4",
+      "notes": "Quantised student before distillation."
+    },
+    {
+      "route": "distill",
+      "model": "q_l_w4a4_kd",
+      "precision": "4W4A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.9369,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 4",
+      "notes": "Blend distillation: +0.11."
+    },
+    {
+      "route": "distill",
+      "model": "tinyplus_kd_full",
+      "precision": "FP32",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.9221,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "yes",
+      "source": "Table 4",
+      "notes": "CPU-only accuracy tier with blend distillation."
+    },
+    {
+      "route": "quant",
+      "model": "finnconv_direct_head8_baseline",
+      "precision": "4W4A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.9349,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 6",
+      "notes": "Structural rebuild cost 0.12 vs q_md but unblocked dataflow."
+    },
+    {
+      "route": "quant",
+      "model": "finnconv_direct_head8_kd_noncheat",
+      "precision": "4W4A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.9355,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "yes",
+      "source": "Table 6",
+      "notes": "Best FINN-friendly student. Starting point for the future FPGA mainline."
+    },
+    {
+      "route": "quant",
+      "model": "finnconv_direct_head8_kdkl_t2",
+      "precision": "4W4A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.9337,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 6",
+      "notes": "KL at T=2 below blend here too."
+    },
+    {
+      "route": "quant",
+      "model": "finnconv_direct_head8_w2a2_kdkl",
+      "precision": "2W2A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": null,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 6",
+      "notes": "No result recorded; 2W2A was not carried to completion."
+    },
+    {
+      "route": "quant",
+      "model": "q_md_w4a4_baseline",
+      "precision": "4W4A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.9361,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 6",
+      "notes": "Main FINN candidate before distillation."
+    },
+    {
+      "route": "quant",
+      "model": "q_md_w4a4_kdkl_t4",
+      "precision": "4W4A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": 0.9345,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "host",
+      "deliverable": "no",
+      "source": "Table 6",
+      "notes": "KL distillation at T=4 underperformed blend."
+    },
+    {
+      "route": "cpu",
+      "model": "tinyfast_xs",
+      "precision": "INT8",
+      "params": 237658,
+      "val_accuracy": null,
+      "test_accuracy": null,
+      "board_throughput_img_s": 310.0,
+      "board_total_time_s": null,
+      "device": "PYNQ-Z1",
+      "deliverable": "yes",
+      "source": "Table 8",
+      "notes": "Middle tier. Throughput only; no accuracy in the paper table."
+    },
+    {
+      "route": "cpu",
+      "model": "tinyfast_xxs",
+      "precision": "INT8",
+      "params": 182478,
+      "val_accuracy": null,
+      "test_accuracy": 0.9109,
+      "board_throughput_img_s": 375.99,
+      "board_total_time_s": 26.6,
+      "device": "PYNQ-Z1",
+      "deliverable": "yes",
+      "source": "Table 8",
+      "notes": "Balanced tier. Default recommendation for most scenarios."
+    },
+    {
+      "route": "cpu",
+      "model": "tinyfast_xxxs",
+      "precision": "INT8",
+      "params": 133714,
+      "val_accuracy": null,
+      "test_accuracy": 0.9045,
+      "board_throughput_img_s": 445.19,
+      "board_total_time_s": 22.46,
+      "device": "PYNQ-Z1",
+      "deliverable": "yes",
+      "source": "Table 8",
+      "notes": "Speed tier. Fastest CPU result in the project."
+    },
+    {
+      "route": "cpu",
+      "model": "tinyplus_kd_fulltrain",
+      "precision": "INT8",
+      "params": 658490,
+      "val_accuracy": null,
+      "test_accuracy": 0.9221,
+      "board_throughput_img_s": 186.8,
+      "board_total_time_s": 53.5,
+      "device": "PYNQ-Z1",
+      "deliverable": "yes",
+      "source": "Table 8",
+      "notes": "Accuracy tier. Full 10000-image board run."
+    },
+    {
+      "route": "bnn",
+      "model": "fpga_quant_student_bnnpynq_lfc_w1a1_kdkl_t2_noncheat",
+      "precision": "1W1A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": null,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "",
+      "deliverable": "host",
+      "source": "no",
+      "notes": "Section 7.2"
+    },
+    {
+      "route": "bnn",
+      "model": "paper_bnnpynq_lfc_1w1a",
+      "precision": "1W1A",
+      "params": 2910208,
+      "val_accuracy": 0.8387,
+      "test_accuracy": 0.8316,
+      "board_throughput_img_s": 154096.0,
+      "board_total_time_s": null,
+      "device": "PYNQ-Z1",
+      "deliverable": "yes",
+      "source": "Section 7",
+      "notes": "Throughput at batch=256. 256-sample board bundle: 214 correct = 83.59%."
+    },
+    {
+      "route": "fpga",
+      "model": "finnconv_direct_head8_kd_noncheat_board_run",
+      "precision": "4W4A",
+      "params": null,
+      "val_accuracy": null,
+      "test_accuracy": null,
+      "board_throughput_img_s": null,
+      "board_total_time_s": null,
+      "device": "",
+      "deliverable": "PYNQ-Z1",
+      "source": "no",
+      "notes": "Section 6.4"
+    }
+  ],
+  "summary": {
+    "board_points": 5,
+    "slowest": 10.0,
+    "fastest": 154096.0,
+    "span_x": 15409.6,
+    "decades": 4.187791365516121,
+    "accuracy_span_pt": 11.61
+  }
+}

@@ -1,0 +1,34 @@
+# Stage 4 -- freeze the teacher into an NPZ of soft targets.
+#
+# This is the leverage point of the whole project: run the 96x96 EfficientNet-B0
+# ONCE, then every student (any width, any bit-width, any route) trains from the
+# cached file. Soft targets are exported at temperature 1.0 and re-scaled by the
+# student's own temperature at training time.
+experiment_name: export_soft_targets
+seed: 42
+data_dir: data
+output_dir: outputs/soft_targets
+device: auto
+
+data:
+  image_size: 96
+  repeat_channels: 3
+  normalize_mean: [0.485, 0.456, 0.406]
+  normalize_std: [0.229, 0.224, 0.225]
+
+model:
+  name: torchvision_teacher
+  architecture: efficientnet_b0
+  pretrained: false
+  dropout: 0.25
+  num_classes: 10
+
+training:
+  batch_size: 256
+  epochs: 0
+  learning_rate: 0.0
+  val_split: 0.1
+  split_seed: 42
+
+export:
+  onnx_opset: 17
