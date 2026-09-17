@@ -57,3 +57,32 @@ def test_results_table_is_sorted_by_throughput():
     ]
     table = format_results_table(rows)
     assert table.index("fast") < table.index("slow")
+
+
+def test_empty_benchmark_inputs_fail_before_running(onnx_path):
+    session = create_session(onnx_path)
+    with pytest.raises(ValueError, match="nonempty"):
+        benchmark_session(session, np.empty((0, 1, 28, 28), np.float32))
+    with pytest.raises(ValueError, match="batch_size"):
+        benchmark_session(session, np.zeros((1, 1, 28, 28), np.float32), batch_size=0)
+
+
+def test_benchmark_reports_actual_thread_settings(onnx_path):
+    session = create_session(onnx_path, intra_op_threads=1, inter_op_threads=2)
+    result = benchmark_session(session, np.zeros((1, 1, 28, 28), np.float32), batch_size=1)
+    assert result.intra_op_threads == 1
+    assert result.inter_op_threads == 2
+
+
+def test_empty_model_suite_is_not_a_success(tmp_path):
+    from fashionfrontier.board.pynq_bench import run_model_suite
+    with pytest.raises(ValueError, match="no ONNX"):
+        run_model_suite(tmp_path, tmp_path / "missing.npz")
+
+
+def test_generic_arm_device_is_not_reported_as_pynq(monkeypatch):
+    from fashionfrontier.board import pynq_bench
+    monkeypatch.setattr(pynq_bench.platform, "machine", lambda: "aarch64")
+    monkeypatch.setattr(pynq_bench.platform, "system", lambda: "Linux")
+    monkeypatch.setattr(pynq_bench.Path, "exists", lambda self: False)
+    assert pynq_bench.detect_device_label() == "Linux host (aarch64)"

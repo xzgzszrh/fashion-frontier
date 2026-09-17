@@ -89,6 +89,10 @@ def benchmark_session(
     board's batch throughput is what a production pipeline sees, while per-image
     latency is what a single interactive request sees.
     """
+    if batch_size <= 0 or warmup_batches < 0:
+        raise ValueError("batch_size must be positive and warmup_batches nonnegative")
+    if len(data) == 0 or (labels is not None and len(labels) != len(data)):
+        raise ValueError("data must be nonempty and labels must match its length")
     name = input_name_of(session)
     data = np.ascontiguousarray(data, dtype=np.float32)
     n = len(data)
@@ -118,6 +122,8 @@ def benchmark_session(
         total_time_s=round(elapsed, 2),
         accuracy=(round(correct / n, 4) if labels is not None else None),
         notes=notes,
+        intra_op_threads=session.get_session_options().intra_op_num_threads,
+        inter_op_threads=session.get_session_options().inter_op_num_threads,
     )
 
 

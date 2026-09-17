@@ -1,188 +1,264 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fashion Frontier — accuracy vs throughput on PYNQ-Z1</title>
-<meta name="description" content="Five Fashion-MNIST models measured on a PYNQ-Z1, from a 94.77% teacher to a 154 096 img/s FPGA fabric route. Runs the real checkpoints in your browser.">
-<meta name="color-scheme" content="light dark">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232563eb'/><circle cx='11' cy='9' r='3' fill='%23fff'/><circle cx='22' cy='22' r='3' fill='%23ea580c'/></svg>">
-<link rel="stylesheet" href="assets/site.css">
-</head>
-<body>
-
-<header class="nav">
-  <div class="nav-in">
-    <a class="brand" href="#top"><span class="mark"></span>Fashion Frontier</a>
-    <nav>
-      <a href="#demo">Live demo</a>
-      <a href="#frontier">Frontier</a>
-      <a href="#results">Results</a>
-      <a href="#playbook">Playbook</a>
-      <a href="#routes">Routes</a>
-    </nav>
-  </div>
-</header>
-
-<main>
-
-  <!-- ------------------------------------------------------------ hero -->
-  <section id="top" class="hero">
-    <div class="hero-in">
-      <div class="eyebrow">Fashion-MNIST · PYNQ-Z1 · accuracy against latency</div>
-      <h1>Nobody ships the most accurate model.<br><em>They ship the one that fits.</em></h1>
-      <p class="lede">
-        This board runs five checkpoints across three routes, from a 94.77% teacher that
-        manages <strong>10 images per second</strong> to a binary network that manages
-        <strong>154 096</strong>. Every number here was measured, and the failures are
-        written up alongside the wins.
-      </p>
-      <div class="stats" id="heroStats"></div>
-    </div>
-  </section>
-
-  <!-- ------------------------------------------------------------ demo -->
-  <section id="demo" class="band">
-    <div class="band-in">
-      <h2>Run the real checkpoints, in this browser</h2>
-      <p class="sub">
-        These are the actual ONNX files, re-verified against the full 10 000-image test set
-        before shipping. Pick a checkpoint and an image, and the numbers below come from your
-        machine — not from a screenshot.
-      </p>
-
-      <div class="demo">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fashion Frontier · Fashion-MNIST on PYNQ-Z1</title>
+    <meta
+      name="description"
+      content="Training, distillation and deployment experiments for Fashion-MNIST on PYNQ-Z1. Explore the results and run five ONNX checkpoints in your browser."
+    />
+    <meta name="color-scheme" content="light" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%233c7059'/><path d='M9 24V8h15M9 16h11' stroke='white' stroke-width='3' fill='none'/></svg>"
+    />
+    <link rel="stylesheet" href="assets/site.css" />
+  </head>
+  <body>
+    <a href="#demo" class="skip-link">Skip to the demo</a>
+    <header class="nav">
+      <div class="nav-in">
+        <a class="brand" href="#top"
+          ><span class="mark">f.</span>Fashion Frontier</a
+        >
+        <nav>
+          <a href="#demo">Try a model</a><a href="#frontier">Measurements</a
+          ><a href="https://github.com/xzgzszrh/fashion-frontier">GitHub ↗</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section id="top" class="hero">
+        <div class="hero-in">
+          <div class="hero-copy">
+            <div class="eyebrow">EXPERIMENT NOTES / 2026</div>
+            <h1>Fashion-MNIST,<br />on a smaller machine.</h1>
+            <p class="lede">
+              Training and deployment experiments on PYNQ-Z1. We compare a
+              teacher network, compact INT8 students and two FPGA routes.
+            </p>
+            <div class="hero-actions">
+              <a class="btn primary" href="#demo"
+                >Try the checkpoints <span>↗</span></a
+              ><a
+                class="text-link"
+                href="https://github.com/xzgzszrh/fashion-frontier/blob/main/docs/10-reproducing.md"
+                >Reproduce the experiments →</a
+              >
+            </div>
+          </div>
+          <div class="specimen">
+            <div class="specimen-head">
+              <span>FASHION-MNIST</span><span>28 × 28 / grayscale</span>
+            </div>
+            <div class="specimen-grid">
+              <img src="samples/sample_00.png" alt="T-shirt sample" /><img
+                src="samples/sample_02.png"
+                alt="Pullover sample"
+              /><img src="samples/sample_03.png" alt="Dress sample" /><img
+                src="samples/sample_04.png"
+                alt="Coat sample"
+              /><img src="samples/sample_08.png" alt="Bag sample" /><img
+                src="samples/sample_09.png"
+                alt="Ankle boot sample"
+              />
+            </div>
+            <div class="specimen-caption">
+              <span>Samples from the test set</span><span>01—06</span>
+            </div>
+          </div>
+        </div>
+        <div class="study-strip">
+          <div><span>Dataset</span><strong>10 classes</strong></div>
+          <div><span>Browser demo</span><strong>5 checkpoints</strong></div>
+          <div><span>Target board</span><strong>PYNQ-Z1</strong></div>
+          <div><span>CPU runtime</span><strong>ONNX / INT8</strong></div>
+        </div>
+      </section>
+      <section id="demo" class="band">
+        <div class="band-in">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">01 / INFERENCE</div>
+              <h2>Try a checkpoint</h2>
+            </div>
+            <span class="context-label"
+              ><i class="dot"></i> Runs in your browser</span
+            >
+          </div>
+          <p class="sub">
+            Choose a model and a sample. The prediction and timing are computed
+            locally with ONNX Runtime Web; they are separate from the board
+            measurements below.
+          </p>
+          <div class="demo">
+            <div class="demo-controls">
+              <div class="ctl-label">
+                Model <span>checkpoint test accuracy</span>
+              </div>
+              <div
+                class="models"
+                id="modelPicker"
+                role="group"
+                aria-label="Choose a checkpoint"
+              ></div>
+              <div class="ctl-label">Input image</div>
+              <div
+                class="input-row"
+                id="samplePicker"
+                role="group"
+                aria-label="Choose a test image"
+              ></div>
+              <div class="upload-row">
+                <button class="upload" id="upload" type="button">
+                  Upload image</button
+                ><input
+                  type="file"
+                  id="file"
+                  accept="image/*"
+                  class="sr"
+                /><span>28 × 28 grayscale samples work best.</span>
+              </div>
+              <div class="actions">
+                <button class="btn primary" id="runOne" type="button">
+                  Predict</button
+                ><button class="btn" id="runAll" type="button">
+                  Compare all five
+                </button>
+              </div>
+              <div
+                class="status"
+                id="status"
+                role="status"
+                aria-live="polite"
+              ></div>
+            </div>
+            <div class="out" id="output" aria-live="polite">
+              <p class="placeholder">Loading checkpoints…</p>
+            </div>
+          </div>
+          <div class="compare-block" id="compareBlock" hidden></div>
+        </div>
+      </section>
+      <section id="frontier" class="band alt">
+        <div class="band-in">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">02 / BOARD MEASUREMENTS</div>
+              <h2>The CPU trade-off</h2>
+            </div>
+            <span class="context-label">PYNQ-Z1 · INT8 · batch 256</span>
+          </div>
+          <p class="sub">
+            Three students with reported accuracy and throughput. The fourth,
+            tinyfast_xs, has a throughput record of approximately 310 img/s but
+            no published accuracy.
+          </p>
+          <div class="chart-wrap">
+            <svg
+              id="frontierSvg"
+              viewBox="0 0 940 410"
+              role="img"
+              aria-label="CPU students: test accuracy versus PYNQ-Z1 throughput"
+            ></svg>
+          </div>
+          <div class="measurement-notes">
+            <div>
+              <span>CPU measurements</span>
+              <p>
+                10,000 test images, two inference threads and one inter-op
+                thread. Historical values are transcribed from Table 8.
+              </p>
+            </div>
+            <div>
+              <span>FPGA measurements</span>
+              <p>
+                BNN-PYNQ records 83.16% test accuracy and 154,096 img/s
+                accelerator throughput at batch 256. This timing excludes Python
+                packing overhead and uses a different measurement scope.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="results" class="band">
+        <div class="band-in">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">03 / EXPERIMENT RECORDS</div>
+              <h2>Results by route</h2>
+            </div>
+            <a
+              class="text-link"
+              href="https://github.com/xzgzszrh/fashion-frontier/blob/main/benchmarks/results.csv"
+              >View source CSV ↗</a
+            >
+          </div>
+          <p class="sub">
+            Paper records retain their original values and source references. A
+            dash means no result was recorded. FINN 4W4A produced a runnable
+            bitstream, but its board output did not match the reference.
+          </p>
+          <div class="filters" id="filters"></div>
+          <div class="chip" id="resultsCount"></div>
+          <div class="cmp-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Route</th>
+                  <th>Model</th>
+                  <th>Precision</th>
+                  <th>Params</th>
+                  <th>Val</th>
+                  <th>Test</th>
+                  <th>img/s</th>
+                  <th>10k s</th>
+                  <th>Device</th>
+                  <th>Deliverable*</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+          <p class="table-note">
+            * Deliverable is the historical experiment label; it does not mean
+            every artifact is included in this repository. The browser demo
+            includes five ONNX files.
+          </p>
+        </div>
+      </section>
+      <section class="next-project">
         <div>
-          <div class="ctl-label">1 · checkpoint</div>
-          <div class="models" id="modelPicker" role="group" aria-label="Choose a checkpoint"></div>
-
-          <div class="ctl-label">2 · test image</div>
-          <div class="input-row" id="samplePicker" role="group" aria-label="Choose a test image"></div>
-          <div class="input-row" style="margin-top:6px">
-            <button class="upload" id="upload" type="button" title="Upload your own image" aria-label="Upload your own image">+</button>
-            <input type="file" id="file" accept="image/*" class="sr">
-            <span class="placeholder" style="align-self:center;font-size:12.5px">
-              or drop in your own — no ground truth, so correctness is not checked
-            </span>
-          </div>
-
-          <div class="actions">
-            <button class="btn primary" id="runOne" type="button">Predict</button>
-            <button class="btn" id="runAll" type="button">Compare all five</button>
-          </div>
-          <div class="status" id="status"></div>
+          <div class="eyebrow">ON THE BOARD</div>
+          <h2>Need a model interface for PYNQ?</h2>
+          <p>
+            PYNQ Runner is the companion project for loading and testing your
+            own ONNX models on the device.
+          </p>
         </div>
-
-        <div class="out" id="output">
-          <p class="placeholder">Loading data…</p>
+        <a class="btn" href="https://github.com/xzgzszrh/pynq-runner"
+          >Open PYNQ Runner ↗</a
+        >
+      </section>
+    </main>
+    <footer>
+      <div class="foot-in">
+        <span>Fashion Frontier · 2026 · MIT</span>
+        <div>
+          <a
+            href="https://github.com/xzgzszrh/fashion-frontier/blob/main/README_CN.md"
+            >中文文档</a
+          ><a href="https://github.com/xzgzszrh/fashion-frontier/tree/main/docs"
+            >Experiment notes ↗</a
+          >
         </div>
+        <span>ONNX Runtime Web <span id="ortv">1.22.0</span></span>
       </div>
-
-      <!-- The five-model comparison needs eight columns, so it gets the full
-           width of the section rather than the narrow right-hand panel. -->
-      <div class="compare-block" id="compareBlock" hidden></div>
-    </div>
-  </section>
-
-  <!-- ------------------------------------------------------------ frontier -->
-  <section id="frontier" class="band alt">
-    <div class="band-in">
-      <h2>The curve you actually have to pick a point on</h2>
-      <p class="sub">
-        Throughput is on a log axis, because the span is four decades wide. Read it left to
-        right and you are giving up accuracy for speed; read it right to left and you are
-        buying accuracy with latency. There is no free move in either direction.
-      </p>
-      <div class="chart-wrap">
-        <svg id="frontierSvg" viewBox="0 0 1000 470" role="img"
-             aria-label="Test accuracy against board throughput for five measured models"></svg>
-      </div>
-      <div class="legend">
-        <span><i class="dot" style="background:var(--cpu)"></i>INT8 CPU tiers — shipped</span>
-        <span><i class="dot" style="background:var(--fabric)"></i>1W1A FPGA fabric — shipped</span>
-        <span><i class="dot" style="background:var(--ref)"></i>FP32 on ARM — measured, not shipped</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ------------------------------------------------------------ results -->
-  <section id="results" class="band">
-    <div class="band-in">
-      <h2>The authoritative table</h2>
-      <p class="sub">
-        Transcribed from the paper, one row per experiment, with the source cited. The same
-        rows drive <code>benchmarks/results.csv</code>, the README figures and this page —
-        they cannot drift apart.
-      </p>
-      <div class="filters" id="filters"></div>
-      <div class="chip" style="margin-bottom:12px" id="resultsCount"></div>
-      <div class="cmp-scroll">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Route</th><th>Model</th><th>Prec</th><th>Params</th>
-              <th>Val</th><th>Test</th><th>img/s</th><th>10k s</th>
-              <th>Device</th><th>Shipped</th><th>Source</th>
-            </tr>
-          </thead>
-          <tbody id="resultsBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ------------------------------------------------------------ playbook -->
-  <section id="playbook" class="band alt">
-    <div class="band-in">
-      <h2>Given a constraint, pick a model</h2>
-      <p class="sub">
-        Six scenarios, each one a real question with a defensible answer. This is the part of
-        the project that transfers to other problems — the architecture does not.
-      </p>
-      <div class="play">
-        <div class="play-list" id="playList" role="group" aria-label="Choose a scenario"></div>
-        <div class="play-detail" id="playDetail"></div>
-      </div>
-
-      <div class="tree">
-        <div class="tree-head" id="treeHead"></div>
-        <div id="treeBody"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ------------------------------------------------------------ routes -->
-  <section id="routes" class="band">
-    <div class="band-in">
-      <h2>Three routes, two closed loops</h2>
-      <p class="sub">
-        One dataset, one board, three different answers to "how do I deploy this" — and one of
-        them is documented as unfinished rather than dressed up.
-      </p>
-      <div class="routes" id="routeList"></div>
-      <div class="caveats" id="caveats"></div>
-    </div>
-  </section>
-
-</main>
-
-<footer>
-  <div class="foot-in">
-    <div>
-      Fashion Frontier · MIT ·
-      <a href="../docs/00-overview.md">docs</a> ·
-      <a href="../benchmarks/results.csv">results.csv</a> ·
-      <a href="../docs/09-lessons-and-negative-results.md">what failed</a>
-    </div>
-    <div>
-      Inference by onnxruntime-web <span id="ortv">1.22.0</span> (WASM, single-threaded).
-      Numbers come from <code>benchmarks/results.csv</code>; nothing on this page is invented.
-    </div>
-  </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.min.js"></script>
-<script src="assets/inference.js"></script>
-<script src="assets/site.js"></script>
-</body>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.min.js"></script>
+    <script src="assets/inference.js"></script>
+    <script src="assets/site.js"></script>
+  </body>
 </html>

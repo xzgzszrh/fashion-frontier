@@ -1,17 +1,4 @@
-"""Build the web demo's data file from the authoritative results table.
-
-The web demo must never invent a number. Everything it plots or tabulates is
-derived here from ``benchmarks/results.csv`` -- the same file the README and the
-docs quote. Run it after the CSV changes:
-
-    python scripts/build_web_data.py
-
-The only hand-maintained part is ``DEMO_MODELS`` below, which records *which*
-checkpoints are shipped to ``web/models/`` and what each one measured when it was
-re-verified against the full 10 000-image test set. That verification matters:
-it is the evidence that the demo runs the paper's actual weights and not a
-placeholder.
-"""
+"""Generate web data from paper records and checkpoint metadata."""
 
 from __future__ import annotations
 
@@ -52,8 +39,7 @@ DEMO_MODELS = [
         "family": "cpu",
         "params": 133714,
         "artifact_accuracy": 0.9045,
-        "blurb": "The fastest CPU result in the project. Throws away 0.6 points "
-                 "against the balanced tier and buys 18% more throughput.",
+        "blurb": "Smallest bundled INT8 student: 133,714 parameters.",
         "source_artifact": "pynq_cpu_tinyfast_xxxs_v1/best_model_int8_qop.onnx",
     },
     {
@@ -67,8 +53,7 @@ DEMO_MODELS = [
         "family": "cpu",
         "params": 182478,
         "artifact_accuracy": 0.9101,
-        "blurb": "The default recommendation. Sits almost exactly in the middle of "
-                 "the CPU frontier, which is where most real constraints land.",
+        "blurb": "INT8 student with 182,478 parameters. Checkpoint accuracy differs slightly from the paper record.",
         "source_artifact": "pynq_cpu_tinyfast_xxs_v1/best_model_int8_qop.onnx",
     },
     {
@@ -82,9 +67,7 @@ DEMO_MODELS = [
         "family": "cpu",
         "params": 658490,
         "artifact_accuracy": 0.9219,
-        "blurb": "4.9x the parameters of the speed tier for 1.76 accuracy points, "
-                 "at 42% of the throughput. The clearest demonstration on this "
-                 "board that width stops paying.",
+        "blurb": "Largest bundled INT8 student: 658,490 parameters.",
         "source_artifact": "pynq_cpu_tinyplus_kd_v1_fulltrain/best_model_int8_qop.onnx",
     },
     {
@@ -98,9 +81,7 @@ DEMO_MODELS = [
         "family": "reference",
         "params": 421834,
         "artifact_accuracy": 0.9174,
-        "blurb": "The first model that worked. Higher accuracy than two of the "
-                 "shipped tiers and slower than all of them - which is exactly "
-                 "why it was not shipped.",
+        "blurb": "FP32 CNN baseline, using 28 × 28 grayscale inputs.",
         "source_artifact": "baseline_cnn/best_model.onnx",
     },
     {
@@ -114,9 +95,7 @@ DEMO_MODELS = [
         "family": "reference",
         "params": 4020358,
         "artifact_accuracy": 0.9477,
-        "blurb": "The accuracy ceiling and the source of every soft label. Running "
-                 "it directly on the board gives the single worst throughput in "
-                 "the project, which is the problem distillation exists to solve.",
+        "blurb": "EfficientNet-B0 teacher, using 96 × 96 inputs and ImageNet normalization.",
         "source_artifact": "efficientnet_b0_transfer_95/best_model.onnx",
     },
 ]
@@ -270,8 +249,8 @@ def main() -> None:
         "_generated_by": "scripts/build_web_data.py",
         "_source_of_truth": "benchmarks/results.csv",
         "_note": (
-            "Do not edit by hand. Every number here is derived from the results "
-            "table, which is itself a transcription of the paper."
+            "Generated file. Historical results come from benchmarks/results.csv; "
+            "checkpoint verification and preprocessing come from DEMO_MODELS."
         ),
         "classes": CLASSES,
         "frontier": build_frontier(rows),

@@ -1,52 +1,33 @@
 #!/usr/bin/env bash
-# Push models + test set to a PYNQ-Z1 and run the full 10000-image benchmark.
-#
-#   ./scripts/deploy_to_board.sh 192.168.2.99
-#
-# The board only needs numpy + onnxruntime (requirements/board.txt).
+# Copy inference code, models and test tensors; reuse the board's Python environment.
 set -euo pipefail
-
-if [ "$#" -lt 1 ]; then
-  echo "usage: deploy_to_board.sh <board-ip> [board-user]" >&2
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+  echo 'usage: deploy_to_board.sh <board-host> [board-user]' >&2
   exit 1
 fi
-
-BOARD_IP="$1"
+BOARD_HOST="$1"
 BOARD_USER="${2:-xilinx}"
-
+BOARD_PYTHON="${BOARD_PYTHON:-python3}"
+[[ "$BOARD_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]] || exit 2
+[[ "$BOARD_USER" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_-]*$ ]] || exit 2
+[[ "$BOARD_PYTHON" =~ ^[a-zA-Z0-9/_.-]+$ ]] || exit 2
 cd "$(dirname "$0")/.."
-
-if [ ! -d artifacts ]; then
-  echo "artifacts/ not found. Run scripts/run_cpu_route.sh first." >&2
+shopt -s nullglob
+MODELS=(artifacts/*_int8.onnx)
+if [ "${#MODELS[@]}" -eq 0 ]; then MODELS=(artifacts/*.onnx); fi
+if [ "${#MODELS[@]}" -eq 0 ] || [ ! -f artifacts/fashion_mnist_test.npz ]; then
+  echo 'Prepare ONNX files and artifacts/fashion_mnist_test.npz first (make test-set).' >&2
   exit 1
 fi
-
-REMOTE_DIR="/home/${BOARD_USER}/fashion-frontier"
-TARGET="${BOARD_USER}@${BOARD_IP}"
-
-echo "==> installing board requirements on ${TARGET}"
-ssh "$TARGET" "mkdir -p ${REMOTE_DIR}"
-scp requirements/board.txt "${TARGET}:${REMOTE_DIR}/"
-ssh "$TARGET" "pip install --quiet -r ${REMOTE_DIR}/board.txt"
-
-echo "==> copying ONNX models and test set"
-if ls artifacts/*_int8.onnx >/dev/null 2>&1; then
-  scp artifacts/*_int8.onnx "${TARGET}:${REMOTE_DIR}/"
-else
-  scp artifacts/*.onnx "${TARGET}:${REMOTE_DIR}/"
-fi
-scp artifacts/fashion_mnist_test.npz "${TARGET}:${REMOTE_DIR}/"
-
-echo "==> running benchmark on board"
+TARGET="${BOARD_USER}@${BOARD_HOST}"
+REMOTE_DIR='fashion-frontier'
+# Check before copying. Do not replace board-provided ARMv7 packages automatically.
+ssh "$TARGET" "$BOARD_PYTHON -c 'import numpy, onnxruntime; print(onnxruntime.__version__)'"
+ssh "$TARGET" "mkdir -p $REMOTE_DIR/src $REMOTE_DIR/artifacts"
+scp -r src/fashionfrontier "${TARGET}:${REMOTE_DIR}/src/"
+scp "${MODELS[@]}" artifacts/fashion_mnist_test.npz "${TARGET}:${REMOTE_DIR}/artifacts/"
 STAMP="$(date +%Y%m%d_%H%M%S)"
-ssh "$TARGET" "cd ${REMOTE_DIR} && python -m fashionfrontier bench \
-  --model-dir . --test-set fashion_mnist_test.npz \
-  --out board_raw_${STAMP}.json"
-
+ssh "$TARGET" "cd $REMOTE_DIR && PYTHONPATH=src $BOARD_PYTHON -m fashionfrontier bench --model-dir artifacts --test-set artifacts/fashion_mnist_test.npz --out board_raw_${STAMP}.json"
 mkdir -p benchmarks/board_raw
-scp "${TARGET}:${REMOTE_DIR}/board_raw_${STAMP}.json" \
-    "benchmarks/board_raw/${STAMP}_pynq.json"
-
-echo "==> results written to benchmarks/board_raw/${STAMP}_pynq.json"
-echo "    Note: these are NOT merged into benchmarks/results.csv -- that file"
-echo "    transcribes the paper and only changes when the paper does."
+scp "${TARGET}:${REMOTE_DIR}/board_raw_${STAMP}.json" "benchmarks/board_raw/${STAMP}_pynq.json"
+echo "Saved benchmarks/board_raw/${STAMP}_pynq.json"

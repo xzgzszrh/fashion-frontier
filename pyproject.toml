@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fashion-frontier"
-version = "1.0.0"
+version = "1.1.0"
 description = "End-to-end inference engineering on PYNQ-Z1: training, distillation, quantisation and multi-path deployment, measured across scenarios."
 readme = "README.md"
 requires-python = ">=3.10"

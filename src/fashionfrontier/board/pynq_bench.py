@@ -53,8 +53,10 @@ def detect_device_label() -> str:
     """
     machine = platform.machine()
     system = platform.system()
-    if machine.startswith("arm") or machine == "aarch64":
-        return f"PYNQ-Z1 ({machine}, {platform.processor() or 'Cortex-A9'})"
+    board_path = Path("/proc/device-tree/model")
+    if board_path.exists():
+        board = board_path.read_text(errors="replace").strip("\x00\n")
+        return f"{board} ({machine})"
     if system == "Darwin":
         return f"macOS host ({machine})"
     return f"{system} host ({machine})"
@@ -70,8 +72,12 @@ def run_board_benchmark(
     notes: str = "",
 ) -> BenchmarkResult:
     """Run the full (or truncated) test set through one ONNX model."""
+    if batch_size <= 0 or (limit is not None and limit <= 0):
+        raise ValueError("batch_size and limit must be positive")
     images, labels = load_test_set(test_set_npz)
-    if limit:
+    if len(images) == 0 or len(images) != len(labels):
+        raise ValueError("test images and labels must be nonempty and have equal lengths")
+    if limit is not None:
         images, labels = images[:limit], labels[:limit]
 
     session = create_session(
@@ -119,8 +125,11 @@ def run_model_suite(
 ) -> list[BenchmarkResult]:
     """Benchmark every ``*.onnx`` in a directory -- the four-tier ladder."""
     model_dir = Path(model_dir)
+    paths = sorted(model_dir.glob("*.onnx"))
+    if not paths:
+        raise ValueError(f"no ONNX models found in {model_dir}")
     results = []
-    for path in sorted(model_dir.glob("*.onnx")):
+    for path in paths:
         results.append(
             run_board_benchmark(
                 path, test_set_npz, batch_size=batch_size, limit=limit

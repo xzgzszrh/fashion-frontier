@@ -36,10 +36,14 @@ students: ## Train the four CPU-only delivery tiers
 	$(PYTHON) -m fashionfrontier train --config configs/cpu/00_tinyplus_base.yaml
 	$(PYTHON) -m fashionfrontier train --config configs/cpu/01_tinyplus_kd.yaml
 	$(PYTHON) -m fashionfrontier train --config configs/cpu/02_tinyplus_kd_fulltrain.yaml
+	$(PYTHON) -m fashionfrontier train --config configs/cpu/03_tinyfast_xs.yaml
 	$(PYTHON) -m fashionfrontier train --config configs/cpu/04_tinyfast_xxs.yaml
 	$(PYTHON) -m fashionfrontier train --config configs/cpu/05_tinyfast_xxxs.yaml
 
 export: ## Export the trained students to ONNX
+	$(PYTHON) -m fashionfrontier export-onnx --model tiny_fashion_cnn --variant tinyfast_xs \
+		--checkpoint outputs/tinyfast_xs/best_model.pt \
+		--out $(ARTIFACTS)/tinyfast_xs_fp32.onnx
 	$(PYTHON) -m fashionfrontier export-onnx --model tiny_fashion_cnn --variant tinyplus \
 		--checkpoint outputs/tinyplus_kd_fulltrain/best_model.pt \
 		--out $(ARTIFACTS)/tinyplus_kd_fulltrain_fp32.onnx
@@ -51,7 +55,7 @@ export: ## Export the trained students to ONNX
 		--out $(ARTIFACTS)/tinyfast_xxxs_fp32.onnx
 
 quantize: ## Static INT8 quantisation of the exported models
-	for m in tinyplus_kd_fulltrain tinyfast_xxs tinyfast_xxxs; do \
+	for m in tinyplus_kd_fulltrain tinyfast_xs tinyfast_xxs tinyfast_xxxs; do \
 		$(PYTHON) -m fashionfrontier quantize --model $(ARTIFACTS)/$${m}_fp32.onnx \
 			--out $(ARTIFACTS)/$${m}_int8.onnx --calib-size 256 || exit 1; \
 	done
@@ -75,9 +79,6 @@ models: ## List TinyFashionCNN variants and parameter counts
 
 web-data: ## Regenerate web/data/results.json from benchmarks/results.csv
 	$(PYTHON) scripts/build_web_data.py
-
-readme-figures: ## Regenerate the SVG figures in assets/ used by the READMEs
-	$(PYTHON) scripts/build_readme_figures.py
 
 demo: ## Serve the repo root on :8000 for the in-browser demo
 	@echo "open http://localhost:8000/web/"

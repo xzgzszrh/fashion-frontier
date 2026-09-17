@@ -11,6 +11,6 @@ Package layout mirrors the delivery pipeline:
     board     PYNQ-Z1 board-side measurement (numpy + onnxruntime only)
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 __all__ = ["__version__"]

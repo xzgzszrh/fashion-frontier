@@ -43,6 +43,7 @@ frontier export-soft-targets \
 frontier train --config configs/cpu/00_tinyplus_base.yaml
 frontier train --config configs/cpu/01_tinyplus_kd.yaml
 frontier train --config configs/cpu/02_tinyplus_kd_fulltrain.yaml
+frontier train --config configs/cpu/03_tinyfast_xs.yaml
 frontier train --config configs/cpu/04_tinyfast_xxs.yaml
 frontier train --config configs/cpu/05_tinyfast_xxxs.yaml
 
@@ -58,24 +59,24 @@ frontier quantize --model artifacts/tinyfast_xxs_fp32.onnx \
 
 ## 板端测速
 
+训练电脑上导出测试集，然后使用部署脚本复制模型、测试数据和推理代码：
+
 ```bash
-# 主机端：导出测试集 NPZ
 frontier export-test-set --out artifacts/fashion_mnist_test.npz
-
-# 拷到板子
-scp artifacts/fashion_mnist_test.npz artifacts/*_int8.onnx xilinx@<board>:~/fashionfrontier/
-
-# 板端（只需 numpy + onnxruntime）
-pip install -r requirements/board.txt
-frontier bench --model-dir artifacts --test-set artifacts/fashion_mnist_test.npz \
-    --out benchmarks/board_raw/$(date +%Y%m%d)_pynq.json
+BOARD_PYTHON=/usr/local/share/pynq-venv/bin/python ./scripts/deploy_to_board.sh <board-ip>
 ```
 
-推荐直接用脚本：
+`BOARD_PYTHON` 应指向板端实际可用的解释器；省略时使用 `python3`。脚本先检查该解释器能否导入 NumPy 和 ONNX Runtime，不自动覆盖板端已有运行时。随后复制 `src/fashionfrontier` 和 `artifacts/`，通过 `PYTHONPATH=src` 运行测速，因此板上不需要安装训练依赖。结果取回到 `benchmarks/board_raw/`。
+
+如果已经手动复制代码和文件，也可以在板端项目根目录运行：
 
 ```bash
-./scripts/deploy_to_board.sh <board-ip>
+PYTHONPATH=src python3 -m fashionfrontier bench \
+  --model-dir artifacts --test-set artifacts/fashion_mnist_test.npz \
+  --out benchmarks/board_raw/my-run.json
 ```
+
+模型与测试张量必须使用一致的输入形状和预处理。上述导出测试集用于 28 × 28 单通道学生模型，不适用于 96 × 96 的教师模型。ARMv7 运行时安装说明见 [PYNQ Runner 部署文档](https://github.com/xzgzszrh/pynq-runner/blob/main/docs/deployment.md)。需要浏览器界面时使用该独立项目。
 
 ## 预期结果
 

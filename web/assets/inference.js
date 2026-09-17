@@ -1,14 +1,4 @@
-/* Real inference, in the browser, on the paper's actual checkpoints.
- *
- * Nothing here is a screenshot or a cached result. The model files in
- * web/models/ were re-verified against the full 10 000-image Fashion-MNIST test
- * set before being shipped, and running them here reproduces the predictions
- * that the PYNQ-Z1 produced - on different hardware, through a different
- * runtime, which is exactly the point of the comparison.
- *
- * onnxruntime-web is loaded from a CDN by index.html as a classic script, so
- * `window.ort` already exists by the time this file runs.
- */
+/* ONNX Runtime Web inference with model-specific preprocessing and warm-up. */
 window.FF = window.FF || {};
 
 (function (FF) {
@@ -17,7 +7,8 @@ window.FF = window.FF || {};
   // Pinned. The models were verified against this build, and a silent minor
   // bump is not something a benchmark page should accept.
   var ORT_VERSION = "1.22.0";
-  var ORT_BASE = "https://cdn.jsdelivr.net/npm/onnxruntime-web@" + ORT_VERSION + "/dist/";
+  var ORT_BASE =
+    "https://cdn.jsdelivr.net/npm/onnxruntime-web@" + ORT_VERSION + "/dist/";
 
   var sessions = new Map();
   var configured = false;
@@ -25,7 +16,7 @@ window.FF = window.FF || {};
   function ort() {
     if (!window.ort) {
       throw new Error(
-        "onnxruntime-web did not load. It is fetched from a CDN, so this needs a network connection."
+        "onnxruntime-web did not load. It is fetched from a CDN, so this needs a network connection.",
       );
     }
     if (!configured) {
@@ -84,9 +75,11 @@ window.FF = window.FF || {};
         var i = (y * size + x) * 4;
         // Fashion-MNIST is greyscale; the RGB branch replicates one luma plane
         // into three channels rather than inventing colour.
-        var value = (0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) / 255;
+        var value =
+          (0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) / 255;
         for (var c = 0; c < channels; c += 1) {
-          var mean = model.mean[c] === undefined ? model.mean[0] : model.mean[c];
+          var mean =
+            model.mean[c] === undefined ? model.mean[0] : model.mean[c];
           var std = model.std[c] === undefined ? model.std[0] : model.std[c];
           out[c * plane + y * size + x] = (value - mean) / std;
         }
@@ -110,9 +103,13 @@ window.FF = window.FF || {};
   }
 
   function median(values) {
-    var sorted = values.slice().sort(function (a, b) { return a - b; });
+    var sorted = values.slice().sort(function (a, b) {
+      return a - b;
+    });
     var mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    return sorted.length % 2
+      ? sorted[mid]
+      : (sorted[mid - 1] + sorted[mid]) / 2;
   }
 
   /* Warm-up matters: the first run pays for kernel selection and memory
@@ -132,7 +129,13 @@ window.FF = window.FF || {};
     version: ORT_VERSION,
 
     load: function (model) {
-      return session(model).then(function () { return true; });
+      return Promise.resolve()
+        .then(function () {
+          return session(model);
+        })
+        .then(function () {
+          return true;
+        });
     },
 
     /* Run one image through one model and report both the prediction and a
@@ -140,72 +143,90 @@ window.FF = window.FF || {};
     run: function (image, model, classes, samples) {
       samples = samples || TIMED;
       var t0 = performance.now();
-      return session(model).then(function (sess) {
-        var tensor = toTensor(image, model);
-        var feeds = {};
-        feeds[sess.inputNames[0]] = tensor;
-        var outName = sess.outputNames[0];
-        var loadMs = performance.now() - t0;
-        var times = [];
-        var logits = null;
-        var batch = 1;
-        var probe = 0;
+      return Promise.resolve()
+        .then(function () {
+          return session(model);
+        })
+        .then(function (sess) {
+          var tensor = toTensor(image, model);
+          var feeds = {};
+          feeds[sess.inputNames[0]] = tensor;
+          var outName = sess.outputNames[0];
+          var loadMs = performance.now() - t0;
+          var times = [];
+          var logits = null;
+          var batch = 1;
+          var probe = 0;
 
-        function once() {
-          return sess.run(feeds).then(function (out) {
-            if (logits === null) logits = Array.prototype.slice.call(out[outName].data);
-            return out;
-          });
-        }
-
-        function warm(n) {
-          if (n >= WARMUP) return Promise.resolve();
-          var t = performance.now();
-          return once().then(function () {
-            probe = performance.now() - t;
-            return warm(n + 1);
-          });
-        }
-
-        /* One timed sample: `batch` inferences, divided down to a per-image
-         * figure. */
-        function sample() {
-          var t = performance.now();
-          var chain = Promise.resolve();
-          for (var k = 0; k < batch; k += 1) chain = chain.then(once);
-          return chain.then(function () { times.push((performance.now() - t) / batch); });
-        }
-
-        function timed(n) {
-          if (n >= samples) return Promise.resolve();
-          return sample().then(function () { return timed(n + 1); });
-        }
-
-        return warm(0).then(function () {
-          if (probe > 0) {
-            batch = Math.max(1, Math.min(MAX_BATCH, Math.ceil(MIN_SAMPLE_MS / probe)));
+          function once() {
+            return sess.run(feeds).then(function (out) {
+              if (logits === null)
+                logits = Array.prototype.slice.call(out[outName].data);
+              return out;
+            });
           }
-          return timed(0);
-        }).then(function () {
-          var probs = softmax(logits);
-          var ranked = probs
-            .map(function (p, idx) { return { index: idx, label: classes[idx], probability: p }; })
-            .sort(function (a, b) { return b.probability - a.probability; });
-          return {
-            model: model,
-            ranked: ranked,
-            predicted: ranked[0].index,
-            predictedLabel: ranked[0].label,
-            confidence: ranked[0].probability,
-            latencyMs: median(times),
-            fastestMs: Math.min.apply(null, times),
-            slowestMs: Math.max.apply(null, times),
-            loadMs: loadMs,
-            timedRuns: times.length,
-            batch: batch,
-          };
+
+          function warm(n) {
+            if (n >= WARMUP) return Promise.resolve();
+            var t = performance.now();
+            return once().then(function () {
+              probe = performance.now() - t;
+              return warm(n + 1);
+            });
+          }
+
+          /* One timed sample: `batch` inferences, divided down to a per-image
+           * figure. */
+          function sample() {
+            var t = performance.now();
+            var chain = Promise.resolve();
+            for (var k = 0; k < batch; k += 1) chain = chain.then(once);
+            return chain.then(function () {
+              times.push((performance.now() - t) / batch);
+            });
+          }
+
+          function timed(n) {
+            if (n >= samples) return Promise.resolve();
+            return sample().then(function () {
+              return timed(n + 1);
+            });
+          }
+
+          return warm(0)
+            .then(function () {
+              if (probe > 0) {
+                batch = Math.max(
+                  1,
+                  Math.min(MAX_BATCH, Math.ceil(MIN_SAMPLE_MS / probe)),
+                );
+              }
+              return timed(0);
+            })
+            .then(function () {
+              var probs = softmax(logits);
+              var ranked = probs
+                .map(function (p, idx) {
+                  return { index: idx, label: classes[idx], probability: p };
+                })
+                .sort(function (a, b) {
+                  return b.probability - a.probability;
+                });
+              return {
+                model: model,
+                ranked: ranked,
+                predicted: ranked[0].index,
+                predictedLabel: ranked[0].label,
+                confidence: ranked[0].probability,
+                latencyMs: median(times),
+                fastestMs: Math.min.apply(null, times),
+                slowestMs: Math.max.apply(null, times),
+                loadMs: loadMs,
+                timedRuns: times.length,
+                batch: batch,
+              };
+            });
         });
-      });
     },
 
     /* Sequential on purpose: running five sessions concurrently on one wasm
@@ -216,16 +237,21 @@ window.FF = window.FF || {};
       models.forEach(function (model, i) {
         chain = chain.then(function () {
           if (onProgress) onProgress(i, model);
-          return FF.inference.run(image, model, classes).then(function (r) {
-            results.push(r);
-            return r;
-          }).catch(function (err) {
-            results.push({ model: model, error: err.message || String(err) });
-            return null;
-          });
+          return FF.inference
+            .run(image, model, classes)
+            .then(function (r) {
+              results.push(r);
+              return r;
+            })
+            .catch(function (err) {
+              results.push({ model: model, error: err.message || String(err) });
+              return null;
+            });
         });
       });
-      return chain.then(function () { return results; });
+      return chain.then(function () {
+        return results;
+      });
     },
   };
 })(window.FF);
